@@ -1,8 +1,8 @@
 /*
   @author Nguyen Anh Tuan
-  Trong bài này mình sẽ cài đặt code của Singly Linked List:
+  Trong bài này mình sẽ cài đặt code của Circular Linked List (based on Singly Linked List):
   - Node
-  - LinkedList
+  - CircularLinkedList
 
   Ấn build để nó hiện ra từng message của lỗi.
   Để thực thi và xem các ví dụ thì comment những chỗ code lỗi lại.
@@ -32,40 +32,42 @@ public:
   T getData() { return this->__data; };
 };
 
-// Install LinkedList
+// Install CircularLinkedList
 template<class T>
-class LinkedList {
+class CircularLinkedList {
 private:
-  Node<T> __head;
-  Node<T> __tail;
+  Node<T> __first;
 
 public:
-  LinkedList() {
-    this->__head.setNext(this->__tail);
-  };
-  LinkedList(initializer_list<T> lst) {
+  CircularLinkedList() = default;
+  CircularLinkedList(initializer_list<T> lst) {
     typename initializer_list<T>::iterator itr = lst.begin();
-    typename initializer_list<T>::iterator near_end_itr = lst.end();
-    near_end_itr--;
 
-    this->__tail = Node<T>(*near_end_itr);
-    this->__head = Node<T>(*itr, &this->__tail);
-    Node<T>* ptr = &this->__head;
+    this->__first = Node<T>(*itr);
+    Node<T>* ptr = &this->__first;
     itr++;
 
-    while(itr != near_end_itr) {
-      Node<T>* ptr_node = new Node<T>(*itr, &this->__tail);
+    while(itr != lst.end()) {
+      Node<T>* ptr_node = new Node<T>(*itr, &this->__first);
       ptr->setNext(ptr_node);
       ptr = ptr->getNext();
       itr++;
     }
   };
 
-  void Print() {
-    Node<T>* ptr = &this->__head;
-    while(ptr != nullptr) {
+  void Print(int times = 1) {
+    Node<T>* ptr = &this->__first;
+    int c = 0;
+
+    // Print first
+    cout << ptr->getData() << " ";
+    ptr = ptr->getNext();
+
+    while(ptr != &this->__first || c < times) {
       cout << ptr->getData() << " ";
       ptr = ptr->getNext();
+
+      if(ptr == &this->__first) c++;
     };
   };
 };
@@ -76,8 +78,19 @@ int main() {
 
   cout << endl;
 
-  LinkedList<int> lst = { 100, 20, 22, -10, -2, 34, 45 };
+  CircularLinkedList<int> lst = { 1, 2, 3 };
+
+  cout << "Print 1 times: \n";
   lst.Print();
+  cout << endl;
+
+  cout << "Print 2 times: \n";
+  lst.Print(2);
+  cout << endl;
+
+  cout << "Print 3 times: \n";
+  lst.Print(3);
+  cout << endl;
 
   return 0;
 };
