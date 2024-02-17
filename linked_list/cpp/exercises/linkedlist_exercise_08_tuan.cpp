@@ -1,9 +1,10 @@
+
 /*
   @author Nguyen Anh Tuan
-  Quetions 3:
-  Create a linked list class whose Nodes have a data part is integer type and it has print,
-  insertLast, insertFirst methods. Declare a linked list instance, then add numbers of random
-  int numbers and print its element’s data to console.
+  Quetions 7:
+  Create an int (number) linked list class has required methods, removeLast,
+  removeFirst and removeAt. Declare a linked list instance and add numbers of
+  random numbers and perform all of its methods.
 
   Done.
 */
@@ -80,23 +81,21 @@ public:
     this->clear();
   };
 
-  // insertFirst
-  void insertFirst(int data) {
-    Node* new_node = new Node(data, this->__head);
+  // getAt
+  Node* getAt(int n) {
+    Node* ptr = this->__head;
 
-    this->__head = new_node;
+    if(n < 0) n = 0;
+    if(n >= this->__size) n = this->__size - 1;
 
-    this->__size++;
-  };
+    int c = 0;
 
-  // insertLast
-  void insertLast(int data) {
-    Node* new_node = new Node(data);
+    while(c < n) {
+      ptr = ptr->next;
+      c++;
+    };
 
-    this->__tail->next = new_node;
-    this->__tail = new_node;
-
-    this->__size++;
+    return ptr;
   };
 
   void print() {
@@ -116,37 +115,37 @@ public:
       delete ptr;
       ptr = this->__head;
     };
-
-    this->__size = 0;
   };
 };
 
 LListForEachCallBack LinkedList::__printNodeData = [](Node* n, int index) {
-  cout << "Node[" << index << "]->data: " << n->data << endl;
+  cout << n->data << " ";
 };
 
 int main() {
   // Initialize a list
-  LinkedList lst;
+  LinkedList lst = { 11, 12, 9, -7, 3, -91 };
 
-  lst.print();
-  // Add items
-  lst.insertFirst(-100);
-  lst.insertLast(100);
-  lst.insertLast(99);
-  lst.insertFirst(-3);
-  cout << endl;
+  // Get Node at -1
+  // Output: Node at [-1]: 11
+  cout << "Node at [-1]: " << (lst.getAt(-1))->data << endl;
 
-  // Re-print (1)
-  cout << "Print lst (1): \n";
-  lst.print();
+  // Get Node at 9999
+  // Output: Node at [9999]: -91
+  cout << "Node at [9999]: " << (lst.getAt(9999))->data << endl;
 
-  // Delete items
-  lst.clear();
-  cout << endl;
+  // Get Node at 3
+  // Output: Node at [3]: -7
+  cout << "Node at [3]: " << (lst.getAt(3))->data << endl;
 
-  // Re-print (2)
-  cout << "Print lst (2): \n";
-  lst.print();
+  // Get Node at 4
+  // Output: Node at [4]: 3
+  cout << "Node at [4]: " << (lst.getAt(4))->data << endl;
+
+  // Get Node at 1
+  // Output: Node at [1]: 12
+  cout << "Node at [1]: " << (lst.getAt(1))->data << endl;
+
   return 0;
 };
+

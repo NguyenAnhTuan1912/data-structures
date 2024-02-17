@@ -1,9 +1,8 @@
 /*
   @author Nguyen Anh Tuan
-  Quetions 3:
-  Create a linked list class whose Nodes have a data part is integer type and it has print,
-  insertLast, insertFirst methods. Declare a linked list instance, then add numbers of random
-  int numbers and print its element’s data to console.
+  Quetions 4:
+  Create a linked list class similar to question 3, but Its Nodes’ data part is Point type.
+  Initialize a linked list instance, then add numbers of random Points and print its element’s data to console.
 
   Done.
 */
@@ -15,17 +14,31 @@
 
 using namespace std;
 
+class Point {
+public:
+  int x;
+  int y;
+
+  Point() = default;
+  Point(int x, int y): x{x}, y{y} {};
+  explicit Point(int n): x{n}, y{n} {};
+
+  void print() {
+    cout << "(" << x << "; " << y << ")\n";
+  };
+};
+
 class Node {
 public:
-  int data;
+  Point data;
   Node* next = nullptr;
 
   Node() = default;
-  Node(int d): data{d} {};
-  Node(int d, Node* n): data{d}, next{n} {};
+  Node(Point d): data{d} {};
+  Node(Point d, Node* n): data{d}, next{n} {};
 };
 
-using InitializerPointList = initializer_list<int>;
+using InitializerPointList = initializer_list<Point>;
 using LListForEachCallBack = function<void(Node*, int index)>;
 
 class LinkedList {
@@ -81,7 +94,8 @@ public:
   };
 
   // insertFirst
-  void insertFirst(int data) {
+  // insertFirst
+  void insertFirst(Point data) {
     Node* new_node = new Node(data, this->__head);
 
     this->__head = new_node;
@@ -90,7 +104,7 @@ public:
   };
 
   // insertLast
-  void insertLast(int data) {
+  void insertLast(Point data) {
     Node* new_node = new Node(data);
 
     this->__tail->next = new_node;
@@ -122,7 +136,7 @@ public:
 };
 
 LListForEachCallBack LinkedList::__printNodeData = [](Node* n, int index) {
-  cout << "Node[" << index << "]->data: " << n->data << endl;
+  n->data.print();
 };
 
 int main() {
@@ -131,10 +145,11 @@ int main() {
 
   lst.print();
   // Add items
-  lst.insertFirst(-100);
-  lst.insertLast(100);
-  lst.insertLast(99);
-  lst.insertFirst(-3);
+  lst.insertFirst({ 1, 2 });
+  lst.insertLast({ 4, 2 });
+  lst.insertLast({ 1, -2 });
+  lst.insertFirst({ -10, 4 });
+
   cout << endl;
 
   // Re-print (1)
@@ -143,6 +158,7 @@ int main() {
 
   // Delete items
   lst.clear();
+
   cout << endl;
 
   // Re-print (2)
@@ -150,3 +166,4 @@ int main() {
   lst.print();
   return 0;
 };
+

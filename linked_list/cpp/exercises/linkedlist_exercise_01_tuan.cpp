@@ -69,7 +69,7 @@ public:
     this->clear();
   };
 
-  void Print() {
+  void print() {
     Node* ptr = this->__head;
 
     if(ptr == nullptr) {
@@ -107,23 +107,23 @@ int main() {
   LinkedList lst_05 = { 5, 10, 15, 20, 25 };
 
   cout << "Print lst_01: \n";
-  lst_01.Print();
+  lst_01.print();
   cout << endl;
 
   cout << "Print lst_02: \n";
-  lst_02.Print();
+  lst_02.print();
   cout << endl;
 
   cout << "Print lst_03: \n";
-  lst_03.Print();
+  lst_03.print();
   cout << endl;
 
   cout << "Print lst_04: \n";
-  lst_04.Print();
+  lst_04.print();
   cout << endl;
 
   cout << "Print lst_05: \n";
-  lst_05.Print();
+  lst_05.print();
   cout << endl;
 
   cout <<endl;
@@ -137,23 +137,23 @@ int main() {
   cout << endl;
 
   cout << "Print lst_01: \n";
-  lst_01.Print();
+  lst_01.print();
   cout << endl;
 
   cout << "Print lst_02: \n";
-  lst_02.Print();
+  lst_02.print();
   cout << endl;
 
   cout << "Print lst_03: \n";
-  lst_03.Print();
+  lst_03.print();
   cout << endl;
 
   cout << "Print lst_04: \n";
-  lst_04.Print();
+  lst_04.print();
   cout << endl;
 
   cout << "Print lst_05: \n";
-  lst_05.Print();
+  lst_05.print();
   cout << endl;
 
   return 0;
