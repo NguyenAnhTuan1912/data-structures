@@ -7,8 +7,9 @@ Ngoài data structures là bắt buộc ra thì cũng khuyến khích có thêm 
 
 ## Attendees (Contributors)
 1. __Nguyễn Anh Tuấn__, xem thêm thông tin [tại đây](https://github.com/NguyenAnhTuan1912)
-1. __Từ Nhật Phương__, xem thêm thông tin [tại đây](https://github.com/phapdev)
-1. __Lương Văn Pháp__, xem thêm thông tin [tại đây](https://github.com/FromSunNews)
+2. __Từ Nhật Phương__, xem thêm thông tin [tại đây](https://github.com/phapdev)
+3. __Lương Văn Pháp__, xem thêm thông tin [tại đây](https://github.com/FromSunNews)
+4. __Thái Anh Đức__, xem thêm thông tin [tại đây](https://github.com/ThaiAnhDuc02)
 
 ## Core Concepts
 Những nội dung mà tụi mình phải tìm hiểu (có thể sẽ có thêm nhiều nội dung nữa)

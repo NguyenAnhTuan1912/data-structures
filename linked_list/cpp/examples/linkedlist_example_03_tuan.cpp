@@ -36,19 +36,20 @@ public:
 template<class T>
 class CircularLinkedList {
 private:
-  Node<T> __first;
+  Node<T>* __first;
 
 public:
   CircularLinkedList() = default;
   CircularLinkedList(initializer_list<T> lst) {
     typename initializer_list<T>::iterator itr = lst.begin();
 
-    this->__first = Node<T>(*itr);
-    Node<T>* ptr = &this->__first;
+    this->__first = new Node<T>(*itr);
+    this->__first->setNext(this->__first);
+    Node<T>* ptr = this->__first;
     itr++;
 
     while(itr != lst.end()) {
-      Node<T>* ptr_node = new Node<T>(*itr, &this->__first);
+      Node<T>* ptr_node = new Node<T>(*itr, this->__first);
       ptr->setNext(ptr_node);
       ptr = ptr->getNext();
       itr++;
@@ -56,18 +57,20 @@ public:
   };
 
   void Print(int times = 1) {
-    Node<T>* ptr = &this->__first;
+    Node<T>* ptr = this->__first;
     int c = 0;
 
     // Print first
     cout << ptr->getData() << " ";
     ptr = ptr->getNext();
 
-    while(ptr != &this->__first || c < times) {
+    if(ptr == this->__first) c++;
+
+    while(ptr != this->__first || c < times) {
       cout << ptr->getData() << " ";
       ptr = ptr->getNext();
 
-      if(ptr == &this->__first) c++;
+      if(ptr == this->__first) c++;
     };
   };
 };

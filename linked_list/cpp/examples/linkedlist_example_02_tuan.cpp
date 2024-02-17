@@ -39,39 +39,44 @@ public:
 template<class T>
 class DoublyLinkedList {
 private:
-  Node<T> __head;
-  Node<T> __tail;
+  Node<T>* __head;
+  Node<T>* __tail;
 
 public:
   DoublyLinkedList() {
-    this->__head.setNext(this->__tail);
-    this->__tail.setPrev(this->__head);
+    this->__head = new Node<T>();
+    this->__tail = this->__head;
   };
   DoublyLinkedList(initializer_list<T> lst) {
     typename initializer_list<T>::iterator itr = lst.begin();
-    typename initializer_list<T>::iterator near_end_itr = lst.end();
-    near_end_itr--;
+    typename initializer_list<T>::iterator last_item_itr = lst.end();
+    last_item_itr--;
 
-    this->__tail = Node<T>(*near_end_itr);
-    this->__head = Node<T>(*itr);
+    // Setup
+    this->__head = new Node<T>(*itr);
+    this->__tail = this->__head;
 
-    this->__head.setNext(&this->__tail);
-    this->__tail.setPrev(&this->__head);
+    if(last_item_itr == itr) return;
 
-    Node<T>* ptr = &this->__head;
+    this->__tail = new Node<T>(*last_item_itr);
+
+    this->__head->setNext(this->__tail);
+    this->__tail->setPrev(this->__head);
+
+    Node<T>* ptr = this->__head;
     itr++;
 
-    while(itr != near_end_itr) {
-      Node<T>* ptr_node = new Node<T>(*itr, ptr, &this->__tail);
+    while(itr != last_item_itr) {
+      Node<T>* ptr_node = new Node<T>(*itr, ptr, this->__tail);
       ptr->setNext(ptr_node);
-      this->__tail.setPrev(ptr_node);
+      this->__tail->setPrev(ptr_node);
       ptr = ptr->getNext();
       itr++;
     }
   };
 
   void PrintFromHead() {
-    Node<T>* ptr = &this->__head;
+    Node<T>* ptr = this->__head;
     while(ptr != nullptr) {
       cout << ptr->getData() << " ";
       ptr = ptr->getNext();
@@ -79,7 +84,7 @@ public:
   };
 
   void PrintFromTail() {
-    Node<T>* ptr = &this->__tail;
+    Node<T>* ptr = this->__tail;
     while(ptr != nullptr) {
       cout << ptr->getData() << " ";
       ptr = ptr->getPrev();

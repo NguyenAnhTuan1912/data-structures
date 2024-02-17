@@ -36,25 +36,33 @@ public:
 template<class T>
 class LinkedList {
 private:
-  Node<T> __head;
-  Node<T> __tail;
+  Node<T>* __head;
+  Node<T>* __tail;
 
 public:
   LinkedList() {
-    this->__head.setNext(this->__tail);
+    this->__head = new Node<T>();
+    this->__tail = this->__head;
   };
   LinkedList(initializer_list<T> lst) {
     typename initializer_list<T>::iterator itr = lst.begin();
-    typename initializer_list<T>::iterator near_end_itr = lst.end();
-    near_end_itr--;
+    typename initializer_list<T>::iterator last_item_itr = lst.end();
+    last_item_itr--;
 
-    this->__tail = Node<T>(*near_end_itr);
-    this->__head = Node<T>(*itr, &this->__tail);
-    Node<T>* ptr = &this->__head;
+    // Setup
+    this->__head = new Node<T>(*itr);
+    this->__tail = this->__head;
+
+    if(last_item_itr == itr) return;
+
+    this->__tail = new Node<T>(*last_item_itr);
+    this->__head->setNext(this->__tail);
+    Node<T>* ptr = this->__head;
+
     itr++;
 
-    while(itr != near_end_itr) {
-      Node<T>* ptr_node = new Node<T>(*itr, &this->__tail);
+    while(itr != last_item_itr) {
+      Node<T>* ptr_node = new Node<T>(*itr, this->__tail);
       ptr->setNext(ptr_node);
       ptr = ptr->getNext();
       itr++;
@@ -62,7 +70,7 @@ public:
   };
 
   void Print() {
-    Node<T>* ptr = &this->__head;
+    Node<T>* ptr = this->__head;
     while(ptr != nullptr) {
       cout << ptr->getData() << " ";
       ptr = ptr->getNext();
