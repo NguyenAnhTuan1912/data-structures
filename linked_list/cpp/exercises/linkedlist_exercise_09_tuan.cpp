@@ -131,7 +131,7 @@ LListForEachCallBack LinkedList::__printNodeData = [](Node* n, int index) {
 };
 
 int main() {
-  // Initialize a list
+  // Declare a list
   LinkedList lst;
 
   // Add items

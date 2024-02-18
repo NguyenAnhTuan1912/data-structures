@@ -123,7 +123,7 @@ LListForEachCallBack LinkedList::__printNodeData = [](Node* n, int index) {
 };
 
 int main() {
-  // Initialize a list
+  // Declare a list
   LinkedList lst = { 11, 12, 9, -7, 3, -91 };
 
   // Get Node at -1

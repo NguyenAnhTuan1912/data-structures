@@ -30,8 +30,8 @@ using LListForEachCallBack = function<void(Node*, int index)>;
 
 class DoublyLinkedList {
 private:
-  Node* __head;
-  Node* __tail;
+  Node* __head = nullptr;
+  Node* __tail = nullptr;
   size_t __size = 1;
 
   static LListForEachCallBack __printNodeData;
@@ -59,10 +59,7 @@ private:
   };
 
 public:
-  DoublyLinkedList() {
-    this->__head = new Node();
-    this->__tail = this->__head;
-  };
+  DoublyLinkedList() = default;
   DoublyLinkedList(InitializerPointList lst) {
     InitializerPointList::iterator itr = lst.begin();
     InitializerPointList::iterator last_item_itr = lst.end();
@@ -293,7 +290,7 @@ LListForEachCallBack DoublyLinkedList::__printNodeData = [](Node* n, int index) 
 };
 
 int main() {
-  // Initialize
+  // Declare
   DoublyLinkedList lst;
 
   // Add Nodes

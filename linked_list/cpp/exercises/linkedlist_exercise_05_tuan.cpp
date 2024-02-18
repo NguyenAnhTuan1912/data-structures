@@ -146,7 +146,7 @@ int main() {
     cout << n->data << " ";
   };
 
-  // Initialize 2 lists
+  // Declare 2 lists
   LinkedList<Point> point_lst;
   LinkedList<int> number_lst;
 
