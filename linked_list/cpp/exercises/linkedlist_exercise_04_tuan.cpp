@@ -49,12 +49,12 @@ private:
 
   static LListForEachCallBack __printNodeData;
 
-  void __forEach(LListForEachCallBack Cb = NULL) {
+  void __forEach(LListForEachCallBack cb = NULL) {
     Node* ptr = this->__head;
     int index = 0;
 
     while(ptr != nullptr) {
-      if(Cb != NULL) Cb(ptr, index);
+      if(cb != NULL) cb(ptr, index);
       ptr = ptr->next;
       index++;
     };

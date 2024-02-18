@@ -51,12 +51,12 @@ private:
   Node<T>* __tail;
   size_t __size = 1;
 
-  void __forEach(LListForEachCallBack<T> Cb = NULL) {
+  void __forEach(LListForEachCallBack<T> cb = NULL) {
     Node<T>* ptr = this->__head;
     int index = 0;
 
     while(ptr != nullptr) {
-      if(Cb != NULL) Cb(ptr, index);
+      if(cb != NULL) cb(ptr, index);
       ptr = ptr->next;
       index++;
     };

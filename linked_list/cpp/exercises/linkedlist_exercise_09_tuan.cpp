@@ -1,9 +1,8 @@
 /*
   @author Nguyen Anh Tuan
-  Quetions 3:
-  Create a linked list class whose Nodes have a data part is integer type and it has print,
-  insertLast, insertFirst methods. Declare a linked list instance, then add numbers of random
-  int numbers and print its element’s data to console.
+  Quetions 9:
+  Create an int (number) linked list class has insertByOrder method.
+  Declare a linked list and add numbers of random numbers with insertByOrder.
 
   Done.
 */
@@ -80,23 +79,29 @@ public:
     this->clear();
   };
 
-  // insertFirst
-  void insertFirst(int data) {
-    Node* new_node = new Node(data, this->__head);
+  // insertOrderBy
+  void insertOrderBy(int data, bool isIncrease = true) {
+    if(this->__head == nullptr) {
+      // Perform insert here
+      return;
+    };
 
-    this->__head = new_node;
+    Node* ptr = this->__head;
+    Node* before = nullptr;
 
-    this->__size++;
-  };
+    while(ptr != nullptr) {
+      if(isIncrease && ptr->data > data) break;
+      if(!isIncrease && ptr->data <= data) break;
 
-  // insertLast
-  void insertLast(int data) {
-    Node* new_node = new Node(data);
+      before = ptr;
+      ptr = ptr->next;
+    };
 
-    this->__tail->next = new_node;
-    this->__tail = new_node;
+    Node* new_node = new Node(data, ptr);
+    if(before != nullptr) before->next = new_node;
 
-    this->__size++;
+    if(ptr == nullptr) this->__tail = new_node;
+    else if(ptr == this->__head) this->__head = new_node;
   };
 
   void print() {
@@ -122,31 +127,28 @@ public:
 };
 
 LListForEachCallBack LinkedList::__printNodeData = [](Node* n, int index) {
-  cout << "Node[" << index << "]->data: " << n->data << endl;
+  cout << n->data << " ";
 };
 
 int main() {
   // Initialize a list
   LinkedList lst;
 
-  lst.print();
   // Add items
-  lst.insertFirst(-100);
-  lst.insertLast(100);
-  lst.insertLast(99);
-  lst.insertFirst(-3);
-  cout << endl;
+  lst.insertOrderBy(-5);
+  lst.insertOrderBy(1);
+  lst.insertOrderBy(10);
+  lst.insertOrderBy(-10);
+  lst.insertOrderBy(5);
+  lst.insertOrderBy(100);
+  lst.insertOrderBy(25);
+  lst.insertOrderBy(30);
+  lst.insertOrderBy(-1);
+  lst.insertOrderBy(10);
 
-  // Re-print (1)
-  cout << "Print lst (1): \n";
+  // Print
+  cout << "Print lst: \n";
   lst.print();
-
-  // Delete items
-  lst.clear();
   cout << endl;
-
-  // Re-print (2)
-  cout << "Print lst (2): \n";
-  lst.print();
   return 0;
 };

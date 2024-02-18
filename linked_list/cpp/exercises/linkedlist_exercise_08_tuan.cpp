@@ -1,10 +1,8 @@
-
 /*
   @author Nguyen Anh Tuan
-  Quetions 7:
-  Create an int (number) linked list class has required methods, removeLast,
-  removeFirst and removeAt. Declare a linked list instance and add numbers of
-  random numbers and perform all of its methods.
+  Quetions 8:
+  Create an int (number) linked list class has getAt method.
+  Initialize a linked list and perform getAt method.
 
   Done.
 */
@@ -37,12 +35,12 @@ private:
 
   static LListForEachCallBack __printNodeData;
 
-  void __forEach(LListForEachCallBack Cb = NULL) {
+  void __forEach(LListForEachCallBack cb = NULL) {
     Node* ptr = this->__head;
     int index = 0;
 
     while(ptr != nullptr) {
-      if(Cb != NULL) Cb(ptr, index);
+      if(cb != NULL) cb(ptr, index);
       ptr = ptr->next;
       index++;
     };
@@ -115,6 +113,8 @@ public:
       delete ptr;
       ptr = this->__head;
     };
+
+    this->__size = 0;
   };
 };
 
@@ -148,4 +148,3 @@ int main() {
 
   return 0;
 };
-
