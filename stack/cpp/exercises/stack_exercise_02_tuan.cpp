@@ -1,9 +1,9 @@
 /*
   @author Nguyen Anh Tuan
-  Trong bài này mình sẽ cài đặt code của Stack
+  Question:
+  Create a Stack to control the loop operation in program, recursion; prevent infinite loop.
 
-  Ấn build để nó hiện ra từng message của lỗi.
-  Để thực thi và xem các ví dụ thì comment những chỗ code lỗi lại.
+  Done.
 */
 
 #include <iostream>

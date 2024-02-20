@@ -1,9 +1,11 @@
 /*
   @author Nguyen Anh Tuan
-  Trong bài này mình sẽ cài đặt code của Stack
+  Question:
+  Create a generic Stack has pop, push, getSize, isEmpty and getTop.
+  Initializer 3 stack of People, Animals and Vehicle (each stack has
+  arbitrary numbers of items). Perform all methods of Stack.
 
-  Ấn build để nó hiện ra từng message của lỗi.
-  Để thực thi và xem các ví dụ thì comment những chỗ code lỗi lại.
+  Done.
 */
 
 #include <iostream>
