@@ -7,14 +7,14 @@ using namespace std;
 
 int main() {
   // Print
-  StackForEachCallBack<int> printInt = [](const StackNode<int>* sn) { cout << sn->data << " "; };
+  ConstStackNodeCallBack<int> printInt = [](const StackNode<int>* sn) { cout << sn->data << " "; };
 
   Stack<int> s = {10, 20, -2, 3, 5, 8, 11, 201, 30, 99, -39, -32, -41};
 
   try {
     // print
     cout << "Size of stack: " << s.getSize() << endl;
-    cout << "Print stack: \n"; s.print(printInt);
+    cout << "Print stack: \n"; s.forEach(printInt);
     cout << endl << endl;
 
     // pop more
@@ -24,7 +24,7 @@ int main() {
 
     // print
     cout << "Size of stack: " << s.getSize() << endl;
-    cout << "Print stack: \n"; s.print(printInt);
+    cout << "Print stack: \n"; s.forEach(printInt);
     cout << endl;
 
     // push more
@@ -36,7 +36,7 @@ int main() {
 
     // print
     cout << "Size of stack: " << s.getSize() << endl;
-    cout << "Print stack: \n"; s.print(printInt);
+    cout << "Print stack: \n"; s.forEach(printInt);
     cout << endl << endl;
 
     // clear all
@@ -46,7 +46,7 @@ int main() {
 
     // print
     cout << "Size of stack: " << s.getSize() << endl;
-    cout << "Print stack: \n"; s.print(printInt);
+    cout << "Print stack: \n"; s.forEach(printInt);
     cout << endl;
 
     // push until error
@@ -60,7 +60,7 @@ int main() {
 
     // print
     cout << "Size of stack: " << s.getSize() << endl;
-    cout << "Print stack: \n"; s.print(printInt);
+    cout << "Print stack: \n"; s.forEach(printInt);
     cout << endl;
 
     return 0;

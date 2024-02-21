@@ -38,10 +38,10 @@ int main() {
   CompareFn<Person> doublyLListInsertPersonIncreasinglyByAge = [](Person& curr, Person& data) { return curr.age >= data.age; };
 
   // Print
-  LListForEachCallBack<Point> printPoint = [](Node<Point>* n, int index) {
+  ConstSinglyLLNodeCallBack<Point> printPoint = [](SinglyLLNode<Point>* n, int index) {
     n->data.print();
   };
-  DoublyLListForEachCallBack<Person> printPerson = [](DoubleNode<Person>* n, int index) {
+  ConstDoublyLLNodeCallBack<Person> printPerson = [](DoublyLLNode<Person>* n, int index) {
     n->data.print();
   };
 
@@ -66,10 +66,10 @@ int main() {
 
   // Print list.
   cout << "Print points: \n";
-  points.print(printPoint);
+  points.forEach(printPoint);
   cout << endl;
   cout << "Print people: \n";
-  people.printFromHead(printPerson);
+  people.forEach(printPerson);
   cout << endl;
 
   // Get Nodes
@@ -97,19 +97,20 @@ int main() {
 
   // Print list.
   cout << "Print points: \n";
-  points.print(printPoint);
+  points.forEach(printPoint);
   cout << endl;
   cout << "Print people: \n";
-  people.printFromHead(printPerson);
+  people.forEach(printPerson);
   cout << endl;
 
   // Clear
+  cout << "ClEAR ALL !!!\n\n";
   points.clear();
   people.clear();
-
-  cout << "ClEAR ALL !!!\n\n";
+  cout << endl;
 
   // Add Nodes
+  cout << "Add some nodes...\n";
   points.insertAt({ 1, 2 }, 0);
   points.insertAt({ -4, 3 }, -10);
   points.insertAt({ 10, -9 }, 2);
@@ -123,13 +124,17 @@ int main() {
   people.insertAt({ "Katalina", 38 }, 999);
   people.insertOrderBy({ "Tuan", 21 }, doublyLListInsertPersonIncreasinglyByAge);
   people.insertOrderBy({ "A", 11 }, doublyLListInsertPersonIncreasinglyByAge);
+  cout << endl;
 
   // Print list.
   cout << "Print points: \n";
-  points.print(printPoint);
+  points.forEach(printPoint);
   cout << endl;
-  cout << "Print people: \n";
-  people.printFromHead(printPerson);
+  cout << "Print people (from head): \n";
+  people.forEach(printPerson);
+  cout << endl;
+  cout << "Print people (from tail): \n";
+  people.forEach(printPerson, false);
   cout << endl;
 
   return 0;
