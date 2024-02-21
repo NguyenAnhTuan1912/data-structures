@@ -16,11 +16,9 @@ Những nội dung mà tụi mình phải tìm hiểu (có thể sẽ có thêm 
 1. Linked List, [xem thêm](/linked_list)
 2. Stack, [xem thêm](/stack)
 3. Queue, [xem thêm](/queue)
-4. Heap, [xem thêm](/heap)
+4. Hash Table, [xem thêm](/hash_table)
 5. Graph, [xem thêm](/graph)
 6. Tree, [xem thêm](/tree)
-7. Hash Table, [xem thêm](/hash_table)
-8. Map, [xem thêm](/map)
 
 ## Languages
 Không giới hạn ngôn ngữ, nhưng đề xuất một số ngôn ngữ sau:
