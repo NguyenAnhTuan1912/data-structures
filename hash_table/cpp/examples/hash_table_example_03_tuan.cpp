@@ -80,7 +80,7 @@ public:
   // insert
   void insert(string key, int value) {
     // Check key
-    if(this->isBucketEmpty(key)) {
+    if(!this->isBucketEmpty(key)) {
       cout << "The key " << key << " existed!!\n";
       return;
     };
@@ -107,7 +107,7 @@ public:
   // isBucketEmpty
   bool isBucketEmpty(string key) {
     int index = this->__getIndex(key);
-    return __data[index].key == key;
+    return __data[index].key != key;
   };
 
   // getSize

@@ -31,8 +31,8 @@ public:
   };
 
   void reset() {
-    this->key = -1;
     delete this->value;
+    this->key = -1;
     this->value = nullptr;
   };
 };
@@ -46,7 +46,7 @@ private:
 
   int __getIndex(int key) {
     int index = this->hash(key, true);
-    while(__data[index].key != key) {
+    while(__data[index].key != key && index < __data.size() - 1) {
       index++;
     };
     return index;
@@ -64,7 +64,7 @@ public:
 
     if(hashOnly) return index;
 
-    while(!(__data[index].isEmpty())) {
+    while(!(__data[index].isEmpty()) && index < __data.size() - 1) {
       // Jump 1 slots
       index += 1;
     };
@@ -73,7 +73,14 @@ public:
 
   // insert
   void insert(int key, int value) {
+    // Check key
+    if(!this->isBucketEmpty(key)) {
+      cout << "The key " << key << " existed!!\n";
+      return;
+    };
+
     int index = this->hash(key);
+
     __data[index].key = key;
     __data[index].value = new int(value);
   };
@@ -89,6 +96,12 @@ public:
   int* get(int key) {
     int index = this->__getIndex(key);
     return __data[index].value;
+  };
+
+  // isBucketEmpty
+  bool isBucketEmpty(string key) {
+    int index = this->__getIndex(key);
+    return __data[index].key != key;
   };
 
   // getSize
@@ -119,7 +132,6 @@ int main() {
   HashTable ht;
 
   // Insert data
-  cout << "Size: " << ht.getSize() << endl;
   ht.insert(0, 12);
   ht.insert(3, 2);
   ht.insert(100, -100);
@@ -127,6 +139,7 @@ int main() {
 
   // print
   cout << "Print table: \n";
+  cout << "Size: " << ht.getSize() << endl;
   ht.forEach(printValue);
   cout << endl;
 

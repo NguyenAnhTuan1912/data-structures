@@ -31,8 +31,8 @@ public:
   };
 
   void reset() {
-    this->key = -1;
     delete this->value;
+    this->key = -1;
     this->value = nullptr;
   };
 };
@@ -48,7 +48,7 @@ private:
     int index = this->hash(key);
     int j = 0;
 
-    while(__data[index][j].key != key) {
+    while(__data[index][j].key != key && j < __data.size() - 1) {
       j++;
     };
 
@@ -68,6 +68,12 @@ public:
 
   // insert
   void insert(int key, int value) {
+    // Check key
+    if(!this->isBucketEmpty(key)) {
+      cout << "The key " << key << " existed!!\n";
+      return;
+    };
+
     int index = this->hash(key);
     __data[index].push_back(Bucket(key, new int(value)));
   };
@@ -97,6 +103,21 @@ public:
     if(__data[index][j].isEmpty()) return nullptr;
 
     return __data[index][j].value;
+  };
+
+  // isBucketEmpty
+  bool isBucketEmpty(int key) {
+    int index = this->hash(key);
+
+    if(__data[index].size() == 0) return true;
+
+    int j = this->__getIndexOfBucket(key);
+
+    while(__data[index][j].key != key) {
+      return true;
+    };
+
+    return false;
   };
 
   // getSize
@@ -178,8 +199,8 @@ int main() {
 
   // print element with key.
   cout << "Key: 0 => Value: " << (ht.get(0) == nullptr ? 0 : *(ht.get(0))) << endl;
-  cout << "Key: 5 => Value: " << (ht.get(5) == nullptr ? 0 : *(ht.get(0))) << endl;
-  cout << "Key: 6 => Value: " << (ht.get(6) == nullptr ? 0 : *(ht.get(0))) << endl;
+  cout << "Key: 5 => Value: " << (ht.get(5) == nullptr ? 0 : *(ht.get(5))) << endl;
+  cout << "Key: 6 => Value: " << (ht.get(6) == nullptr ? 0 : *(ht.get(6))) << endl;
   cout << "Key: 1 => Value: " << *(ht.get(1)) << endl;
   cout << "Key: 100 => Value: " << *(ht.get(100)) << endl;
   cout << "Key: 100 => Value: " << *(ht.get(100)) << endl;
