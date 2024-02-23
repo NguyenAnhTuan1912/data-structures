@@ -1,7 +1,7 @@
 /*
   @author Nguyen Anh Tuan
-  Trong bài này mình sẽ cài đặt code của Hash Table với cơ chế
-  Open Addressing với value có kiểu dữ liệu là int. Với các phương thức:
+  Trong bài này mình sẽ cài đặt code của Hash Table với giải pháp đụng độ index
+  Separate Chaining với value có kiểu dữ liệu là int. Với các phương thức:
   - insert
   - remove
   - get
