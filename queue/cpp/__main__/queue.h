@@ -3,6 +3,7 @@
   Đây là file code chính thức của Queue, mọi thay đổi về cấu trúc
   của Queue sẽ được thay đổi trong này.
 */
+
 #ifndef QUEUE_H_INCLUDED
 #define QUEUE_H_INCLUDED
 

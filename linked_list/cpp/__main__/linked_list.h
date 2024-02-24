@@ -3,6 +3,7 @@
   Đây là file code chính thức của LinkedList, mọi thay đổi về cấu trúc
   của LinkedList sẽ được thay đổi trong này.
 */
+
 #ifndef LINKED_LIST_H_INCLUDED
 #define LINKED_LIST_H_INCLUDED
 #pragma once
