@@ -3,7 +3,7 @@
 #[derive(Debug)]
 pub struct ListNode {
     // Node
-    data: i32, // data đc luuw là int
+    data: i32, // data đc luw là int
     next: Option<Box<ListNode>>, // Option - Trả Some() thì là có node ở sau- Box dùng để lưu vị
                // trí ô nhớ chứ ListNode kế tiếp
 }

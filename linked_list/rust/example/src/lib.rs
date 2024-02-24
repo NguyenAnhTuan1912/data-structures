@@ -1,17 +1,4 @@
-pub mod linkedList_01;
-pub mod linkedlist;
-
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+// cargo test de chay filepub mod linked_list;
+pub mod know_types;
+pub mod linked_list_01;
+pub mod linked_list_any_types;
