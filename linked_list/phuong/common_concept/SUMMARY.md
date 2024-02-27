@@ -1,0 +1,7 @@
+## Linked list (Singlely)
+This is a summary about knowledges that I dived into.
+ 1.  Firstly, **Linked List** is a **linear sequence of data collection** that performed by **Sequence** 
+ 2. Secondly, a **Node** include of a **Data** (example here is datas are performed by interger value) and a **Link** to a **Next Node** in the sequence .![](https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Singly-linked-list.svg/408px-Singly-linked-list.svg.png)
+ 3. Thirdly, **Linked List** is a **basic element** to implement **astract data types** such as [lists](https://en.wikipedia.org/wiki/List_(abstract_data_type)), [stacks](https://en.wikipedia.org/wiki/Stack_(abstract_data_type) "Stack (abstract data type)"), [queues](https://en.wikipedia.org/wiki/Queue_(abstract_data_type) "Queue (abstract data type)"), [associative arrays](https://en.wikipedia.org/wiki/Associative_array "Associative array"), and [S-expressions](https://en.wikipedia.org/wiki/S-expression "S-expression")
+ 4. Fourly, **Linked List** is very **effective** when **insertion** or **removal** of elements from **any position** in the sequence during **iteration**
+ 5. Finally, Linked Lists **DO NOT ALLOW** *random access* but instead iterate with each element sequentially. This makes basic problems (such as getting the last node of a list, finding a node containing given data, or determining where to insert a new node) **expensive to operate**.
