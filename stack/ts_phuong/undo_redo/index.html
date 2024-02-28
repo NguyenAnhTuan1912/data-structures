@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="./index.css" type="text/css" />
+    <script src="./index.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="container-preview">
+        <h1 class="preview-text" id="text-preview">
+          Lorem ipsum is placeholder text commonly used in the graphic, print,
+          and publishing industries for previewing layouts and visual mockups.
+        </h1>
+      </div>
+      <hr />
+      <form class="container-control" id="form-control">
+        <label class="control-item" for="text-title">Title:</label>
+        <input class="control-item" id="text-title" type="text" />
+
+        <label class="control-item" for="text-color">Color:</label>
+        <input class="control-item" id="text-color" type="text" />
+
+        <label class="control-item" for="text-size">Size(px):</label>
+        <input class="control-item" id="text-size" type="text" />
+
+        <input
+          class="control-item"
+          type="submit"
+          id="submit-btn"
+          value="Apply"
+        />
+      </form>
+      <hr />
+
+      <div class="container-undo-redo">
+        <button id="undo-btn">Undo</button>
+        <button id="redo-btn">Redo</button>
+        <button id="clear-btn">Clear</button>
+      </div>
+    </div>
+  </body>
+</html>

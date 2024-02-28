@@ -1,0 +1,26 @@
+.container-control {
+  display: flex;
+  flex-direction: column;
+  justify-items: start;
+  align-items: start;
+}
+input {
+  margin-bottom: 10px;
+}
+label {
+  margin-bottom: 5px;
+}
+
+.container-control input {
+  padding: 5px 10px;
+}
+
+button {
+  padding: 5px 10px;
+  margin-right: 5px;
+}
+
+.container-preview {
+  padding: 10px;
+  border: #222222 solid 10px;
+}
