@@ -17,7 +17,6 @@ using namespace std;
 
 bool isPrime(int n) {
   int limit = sqrt(n);
-  cout << "Limit: " << limit << endl;
   for(int i = 2; i < limit; i++) {
     if(n % i == 0) return false;
   };
@@ -86,8 +85,6 @@ public:
       // Jump 1 slots
       index += 1;
     };
-
-    cout << "Hash - key: " << key << ", index: " << index << endl;
 
     size_t old_size = __data.size();
     if(index >= __data.size()) {
