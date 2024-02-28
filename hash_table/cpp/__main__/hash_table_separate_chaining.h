@@ -18,8 +18,7 @@ class HashTable {
 private:
   std::vector<std::vector<Bucket<T>>> __data = std::vector<std::vector<Bucket<T>>>(10);
 
-  int __getIndexOfBucket(std::string key) {
-    int index = this->hash(key);
+  int __getIndexOfBucket(int index, std::string key) {
     int j = 0;
 
     while(__data[index][j].key != key && j < __data[index].size() - 1) {
@@ -66,7 +65,7 @@ public:
 
     if(__data[index].size() == 0) return;
 
-    int j = this->__getIndexOfBucket(key);
+    int j = this->__getIndexOfBucket(index, key);
 
     if(__data[index][j].isEmpty()) return;
 
@@ -79,7 +78,7 @@ public:
 
     if(__data[index].size() == 0) return nullptr;
 
-    int j = this->__getIndexOfBucket(key);
+    int j = this->__getIndexOfBucket(index, key);
 
     if(__data[index][j].isEmpty()) return nullptr;
 
@@ -92,13 +91,9 @@ public:
 
     if(__data[index].size() == 0) return true;
 
-    int j = this->__getIndexOfBucket(key);
+    int j = this->__getIndexOfBucket(index, key);
 
-    while(__data[index][j].key != key) {
-      return true;
-    };
-
-    return false;
+    return __data[index][j].key != key;
   };
 
   // getSize
