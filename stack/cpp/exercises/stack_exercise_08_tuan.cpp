@@ -281,7 +281,7 @@ public:
    * Use this method to end tracing the change of state of target, then
    * calculate change of targe.
    */
-  void endObserve() {
+  void endObserve(int atIndex, string changeData) {
     int
       N = this->__target.prev.size(),
       M = this->__target.curr->size(),
@@ -290,27 +290,22 @@ public:
     // Nothing change
     if(N == M) return;
 
-    cout << "Previous size: " << N << endl;
-    cout << "Current size: " << M << endl;
-
     StringChange change;
     change.amount = amount;
 
     // String is substracted
     if(N > M) {
       change.action = Erase;
-      change.data = this->__target.prev.substr(M, N);
-      change.atIndex = M;
+      change.data = changeData;
+      change.atIndex = atIndex;
     }
 
     // String is appended
     if(N < M) {
       change.action = Append;
-      change.data = this->__target.curr->substr(N, M);
-      change.atIndex = N;
+      change.data = changeData;
+      change.atIndex = atIndex;
     }
-
-    cout << "Data: " << change.data << endl;
 
     this->__undo_stack.push(change);
     // Clear redo stack
@@ -363,6 +358,7 @@ int main() {
       case KEY_i: {
         // Start observe
         stringHistoryStack.startObserve();
+        int N = data->size();
 
         cout << "Nhap chuoi: \n";
         cout << *(data);
@@ -372,7 +368,7 @@ int main() {
         system("cls");
 
         // End observe
-        stringHistoryStack.endObserve();
+        stringHistoryStack.endObserve(N, input);
 
         break;
       };
@@ -381,24 +377,24 @@ int main() {
         // Start observe
         stringHistoryStack.startObserve();
         int s = 0, l = 0, N = data->size();
+        string erased = "";
 
         cout << "Xoa chuoi: \n";
-        cout << "Size: " << N << endl;
         cout << *(data) << endl;
-        cout << "Bat dau: "; cin >> s;
-        cout << "Ket thuc: "; cin >> l;
+        cout << "Bat dau - So ki tu muon xoa: "; cin >> s; cin >> l;
 
         if(s < 0) s = 0;
         if(s >= N) s = N - 2;
         if(l < s) l = s + 1;
         if(l >= N) l = N - 1;
 
+        erased = data->substr(s, l);
         *data = data->erase(s, l);
 
         // system("cls");
 
         // End observe
-        stringHistoryStack.endObserve();
+        stringHistoryStack.endObserve(s, erased);
         break;
       };
 
