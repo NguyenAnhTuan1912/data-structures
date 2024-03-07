@@ -7,9 +7,17 @@
 */
 
 #include <iostream>
+#include <functional>
 #include <exception>
 
 using namespace std;
+
+enum TraverseType {
+  Empty,
+  Inorder,
+  Preorder,
+  Postorder
+};
 
 template<class T>
 class BSTNode {
@@ -26,6 +34,9 @@ public:
 };
 
 template<class T>
+using ConstBSTNodeCallBack = function<void(const BSTNode<T>*)>;
+
+template<class T>
 class BSTree {
 private:
   BSTNode<T>* __root = nullptr;
@@ -33,6 +44,9 @@ private:
   int __depth = 0;
 
   static BSTNode<T>* __search(int key, BSTNode<T>* curr = nullptr);
+  static void __traverseInorder(ConstBSTNodeCallBack<T>& cb, BSTNode<T>* curr);
+  static void __traversePreorder(ConstBSTNodeCallBack<T>& cb, BSTNode<T>* curr);
+  static void __traversePostorder(ConstBSTNodeCallBack<T>& cb, BSTNode<T>* curr);
 
 public:
   BSTree() = default;
@@ -166,9 +180,25 @@ public:
     return result->data;
   };
 
-  // travel
-  void travel() {
+  // traverse
+  void traverse(ConstBSTNodeCallBack<T>& cb, TraverseType traverseType = Inorder) {
+    switch(traverseType) {
+      case Preorder: {
+        this->__traversePreorder(cb, this->__root);
+        break;
+      };
 
+      case Postorder: {
+        this->__traversePostorder(cb, this->__root);
+        break;
+      };
+
+      case Inorder:
+      default: {
+        this->__traverseInorder(cb, this->__root);
+        break;
+      };
+    };
   };
 
   int getDepth() {
@@ -196,25 +226,102 @@ BSTNode<T>* BSTree<T>::__search(int key, BSTNode<T>* curr) {
   return BSTree<T>::__search(key, curr->right);
 };
 
+template<class T>
+void BSTree<T>::__traverseInorder(ConstBSTNodeCallBack<T>& cb, BSTNode<T>* curr) {
+  if(curr == nullptr) return;
+
+  if(curr->left != nullptr) {
+    __traverseInorder(cb, curr->left);
+  };
+
+  // Execute callback
+  cb(curr);
+
+  if(curr->right != nullptr) {
+    __traverseInorder(cb, curr->right);
+  };
+};
+
+template<class T>
+void BSTree<T>::__traversePreorder(ConstBSTNodeCallBack<T>& cb, BSTNode<T>* curr) {
+  if(curr == nullptr) return;
+
+  // Execute callback
+  cb(curr);
+
+  if(curr->left != nullptr) {
+    __traversePreorder(cb, curr->left);
+  };
+
+  if(curr->right != nullptr) {
+    __traversePreorder(cb, curr->right);
+  };
+};
+
+template<class T>
+void BSTree<T>::__traversePostorder(ConstBSTNodeCallBack<T>& cb, BSTNode<T>* curr) {
+  if(curr == nullptr) return;
+
+  if(curr->left != nullptr) {
+    __traversePostorder(cb, curr->left);
+  };
+
+  if(curr->right != nullptr) {
+    __traversePostorder(cb, curr->right);
+  };
+
+  // Execute callback
+  cb(curr);
+};
+
 int main() {
+  // Lambda
+  ConstBSTNodeCallBack<int> printValue = [](const BSTNode<int>* node) {
+    cout << *(node->data) << " ";
+  };
+
   // Declare binary search tree
-  BSTree<int> tree = BSTree<int>(26, new int(5));
+  BSTree<int> tree = BSTree<int>(5, new int(5));
 
-  tree.insertItem(29, new int(3));
-  tree.insertItem(20, new int(9));
-  tree.insertItem(31, new int(8));
-  tree.insertItem(12, new int(10));
-  tree.insertItem(3, new int(2));
+  tree.insertItem(3, new int(3));
+  tree.insertItem(9, new int(9));
+  tree.insertItem(8, new int(8));
+  tree.insertItem(10, new int(10));
+  tree.insertItem(2, new int(2));
 
-  int* ptr = tree.searchItem(12);
+  cout << "Traverse tree (Inorder)\n";
+  tree.traverse(printValue);
+  cout << endl;
+  cout << "Traverse tree (Preorder)\n";
+  tree.traverse(printValue, Preorder);
+  cout << endl;
+  cout << "Traverse tree (Postorder)\n";
+  tree.traverse(printValue, Postorder);
+  cout << endl;
 
-  cout << "Data: " << *ptr << endl;
+  cout << endl;
+  int* ptr = tree.searchItem(10);
+  cout << "Search 10...\n";
+  cout << "Data: " << (ptr == nullptr ? 0 : *ptr) << endl;
 
   // Delete key 9
+  cout << "Delete 9\n";
   tree.deleteItem(9);
 
   ptr = tree.searchItem(9);
+  cout << "Search 9...\n";
   cout << "Data: " << (ptr == nullptr ? 0 : *ptr) << endl;
+  cout << endl;
+
+  cout << "Traverse tree (Inorder)\n";
+  tree.traverse(printValue);
+  cout << endl;
+  cout << "Traverse tree (Preorder)\n";
+  tree.traverse(printValue, Preorder);
+  cout << endl;
+  cout << "Traverse tree (Postorder)\n";
+  tree.traverse(printValue, Postorder);
+  cout << endl;
 
   return 0;
 };
