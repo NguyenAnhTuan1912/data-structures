@@ -46,6 +46,7 @@ private:
   int __depth = 0;
 
   static BSTNode<T>* __search(int key, BSTNode<T>* curr = nullptr);
+  static BSTNode<T>* __delete(int key, BSTNode<T>* curr, int& c);
   static void __traverseInorder(ConstBSTNodeCallBack<T>& cb, BSTNode<T>* curr, int parentKey, int d);
   static void __traversePreorder(ConstBSTNodeCallBack<T>& cb, BSTNode<T>* curr, int parentKey, int d);
   static void __traversePostorder(ConstBSTNodeCallBack<T>& cb, BSTNode<T>* curr, int parentKey, int d);
@@ -75,78 +76,10 @@ public:
   };
 
   // deleteItem
-  BSTNode<T>* deleteItem(int key, BSTNode<T>* curr = nullptr) {
-    if(this->__root == nullptr) return nullptr;
-    if(curr == nullptr) curr = this->__root;
-
-    // Search
-    if (key < curr->key) {
-      if(curr->left == nullptr) return nullptr;
-      curr->left = this->deleteItem(key, curr->left);
-      return curr;
-    } else if(key > curr->key) {
-      if(curr->right == nullptr) return nullptr;
-      curr->right = this->deleteItem(key, curr->right);
-      return curr;
-    };
-
-    // Match
-    // If Node has one child
-    // Left
-    if(curr->left == nullptr) {
-      BSTNode<T>* temp = curr;
-      temp = curr->right;
-      delete curr;
-      this->__count--;
-      return curr;
-    }
-    // Right
-    else if(curr->right == nullptr) {
-      BSTNode<T>* temp = curr;
-      temp = curr->left;
-      delete curr;
-      this->__count--;
-      return curr;
-    }
-    // If Node has both
-    else {
-      // The first choice is always left
-      BSTNode<T>* temp = curr->left;
-      BSTNode<T>* prev = nullptr;
-
-      // And remains are right.
-      while(temp->right != nullptr) {
-        prev = temp;
-        temp = temp->right;
-      };
-
-      if(temp->right == nullptr && temp->left != nullptr) {
-        prev->right = temp->left;
-        temp->left = prev;
-        temp->right = curr->right;
-
-        curr->left = nullptr;
-        curr->right = nullptr;
-        delete curr;
-        this->__count--;
-
-        return temp;
-      };
-
-      if(prev == nullptr) {
-        temp->right = curr->right;
-      } else {
-        temp->left = curr->left;
-        temp->right = curr->right;
-        prev->right = nullptr;
-      }
-
-      curr->left = nullptr;
-      curr->right = nullptr;
-      delete curr;
-      this->__count--;
-      return temp;
-    };
+  void deleteItem(int key) {
+    int c = this->__count;
+    this->__delete(key, this->__root, c);
+    this->__count = c;
   };
 
   // searchItem
@@ -193,22 +126,18 @@ public:
     ConstBSTNodeCallBack<T> cb = [&](const BSTNode<T>* node, int parentKey, int depth) {
       int index = depth * 2, M = 0, N = 0;
       string dashes = "", spaces = "", subOutput = "", keyStr = to_string(node->key);
-      /*
-      cout << "Output: " << (output[index]) << endl;
-      cout << "Index: " << index << endl;
-      cout << "Key: " << keyStr << endl;
-      */
+
       // Root of subtree
       if(!this->isLeaf(node)) {
         // Generate "-" for left child
         if(node->left != nullptr) {
-          if(output[index + 1] != "") {
-            N = maxOutputLength - output[index + 1].size() - 1;
-            M = 2;
-          } else {
+          if(output[index + 1] == "") {
             N = output[index + 2].size() - 1;
             M = maxOutputLength - N;
             M = M < 2 ? 2 : M;
+          } else {
+            N = maxOutputLength - output[index + 1].size() - 1;
+            M = 2;
           };
 
           dashes = string(N, ' ');
@@ -236,13 +165,10 @@ public:
             N = maxOutputLength - 1;
             M = to_string(node->right->key).size() + 1;
           } else {
-            N = maxOutputLength - output[index + 1].size() - 1;
+            N = maxOutputLength - output[index + 1].size() - (keyStr.size());
             N = N < 0 ? 0 : N;
-            M = 2;
+            M = keyStr.size() + 1;
           };
-
-          // M = maxOutputLength - output[index + 1].size();
-          // M = M < 2 ? 2 : M;
 
           dashes = string(N, ' ');
           dashes += string(M, '-');
@@ -254,10 +180,10 @@ public:
       }
       // Left
       else if(node->key < parentKey) {
-        if(output[index] != "") {
-          N = maxOutputLength - output[index].size() - 1;
-          N = N == 0 ? 1 : N;
-        };
+        N = maxOutputLength - output[index].size() - 1;
+
+        if(output[index] == "") N = N < 0 ? 0 : N;
+        else N = N < 0 ? 1 : N;
 
         subOutput = string(N, ' ');
         subOutput += keyStr;
@@ -272,8 +198,6 @@ public:
 
         if(output[index] != "") {
           N = maxOutputLength - output[index].size() - 1;
-          // cout << "Key: " << keyStr << endl;
-          // cout << "N: " << N << endl;
         };
 
         subOutput = string(N, ' ');
@@ -286,6 +210,15 @@ public:
     };
 
     this->traverse(cb, Inorder);
+
+    // Last update dashes for right child of root
+    string rightKey = to_string(this->__root->right->key);
+
+    int M = output[2].size() - output[1].size() - (rightKey.size() - 1);
+
+    if(M > 0) {
+      output[1] += string(M, '-');
+    }
 
     typename vector<string>::iterator itr = output.begin();
 
@@ -305,20 +238,6 @@ bool BSTree<T>::isLeaf(const BSTNode<T>* curr) {
 template<class T>
 bool BSTree<T>::isLeaf(BSTNode<T>* curr) {
   return (curr->left == nullptr) && (curr->right == nullptr);
-};
-
-template<class T>
-BSTNode<T>* BSTree<T>::__search(int key, BSTNode<T>* curr) {
-  if(curr == nullptr) return nullptr;
-  if(curr->key == key) return curr;
-
-  bool isLeft = (key < curr->key);
-
-  if(isLeft) {
-    return BSTree<T>::__search(key, curr->left);
-  }
-
-  return BSTree<T>::__search(key, curr->right);
 };
 
 template<class T>
@@ -385,6 +304,20 @@ void BSTree<T>::__traversePostorder(
 };
 
 template<class T>
+BSTNode<T>* BSTree<T>::__search(int key, BSTNode<T>* curr) {
+  if(curr == nullptr) return nullptr;
+  if(curr->key == key) return curr;
+
+  bool isLeft = (key < curr->key);
+
+  if(isLeft) {
+    return BSTree<T>::__search(key, curr->left);
+  }
+
+  return BSTree<T>::__search(key, curr->right);
+};
+
+template<class T>
 void BSTree<T>::__insert(int key, T*& data, BSTNode<T>* curr, int& d, int& c) {
   try {
     if(curr == nullptr) {
@@ -423,6 +356,72 @@ void BSTree<T>::__insert(int key, T*& data, BSTNode<T>* curr, int& d, int& c) {
   };
 };
 
+template<class T>
+BSTNode<T>* BSTree<T>::__delete(int key, BSTNode<T>* curr, int& c) {
+  if(curr == nullptr) return nullptr;
+
+  // Search
+  if (key < curr->key) {
+    if(curr->left == nullptr) return nullptr;
+    curr->left = BSTree<T>::__delete(key, curr->left, c);
+    return curr;
+  } else if(key > curr->key) {
+    if(curr->right == nullptr) return nullptr;
+    curr->right = BSTree<T>::__delete(key, curr->right, c);
+    return curr;
+  };
+
+  // Match
+  // If Node has one child
+  // Left
+  if(curr->left == nullptr) {
+    BSTNode<T>* temp = curr;
+    temp = curr->right;
+    delete curr;
+    c--;
+    return curr;
+  }
+  // Right
+  else if(curr->right == nullptr) {
+    BSTNode<T>* temp = curr;
+    temp = curr->left;
+    delete curr;
+    c--;
+    return curr;
+  };
+
+  // If Node has both
+  BSTNode<T>* ptrLeft = curr->left;
+  BSTNode<T>* ptrRight = curr->right;
+
+
+  while(ptrLeft->right != nullptr || ptrRight->left != nullptr) {
+    if(ptrLeft->right != nullptr) {
+      ptrLeft = ptrLeft->right;
+    };
+
+    if(ptrRight->left != nullptr) {
+      ptrRight = ptrRight->left;
+    };
+  };
+
+  if(BSTree<T>::isLeaf(ptrLeft)) {
+    ptrLeft->right = curr->right;
+
+    delete curr;
+    c--;
+
+    return ptrLeft;
+  }
+
+  ptrRight->left = curr->left;
+
+  delete curr;
+  c--;
+
+  return ptrRight;
+};
+
 int main() {
   // Lambda
   ConstBSTNodeCallBack<int> printValue = [](const BSTNode<int>* node, int parentKey, int depth) {
@@ -437,7 +436,7 @@ int main() {
   tree.insertItem(8, new int(8));
   tree.insertItem(10, new int(10));
   tree.insertItem(2, new int(2));
-  tree.insertItem(1, new int(1));
+  tree.insertItem(7, new int(7));
 
   cout << "Depth of tree: " << tree.getDepth() << endl;
 
@@ -469,7 +468,6 @@ int main() {
   cout << "Search 9...\n";
   cout << "Data: " << (ptr == nullptr ? 0 : *ptr) << endl;
   cout << endl;
-
   cout << "Traverse tree (Inorder)\n";
   tree.traverse(printValue);
   cout << endl;
@@ -490,9 +488,9 @@ int main() {
   tree.insertItem(3, new int(3));
   tree.insertItem(2, new int(2));
   tree.insertItem(4, new int(4));
-  tree.insertItem(11, new int(11));
+  tree.insertItem(100, new int(100));
   tree.insertItem(10, new int(10));
-  tree.insertItem(12, new int(12));
+  tree.insertItem(102, new int(102));
   tree.insertItem(5, new int(5));
   tree.insertItem(9, new int(9));
 
