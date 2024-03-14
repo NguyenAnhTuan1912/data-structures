@@ -45,6 +45,7 @@ private:
   size_t __count = 0;
   int __depth = 0;
 
+  // Static methods
   static BSTNode<T>* __search(int key, BSTNode<T>* curr = nullptr);
   static BSTNode<T>* __delete(int key, BSTNode<T>* curr, int& c);
   static void __traverseInorder(ConstBSTNodeCallBack<T>& cb, BSTNode<T>* curr, int parentKey, int d);
@@ -218,6 +219,8 @@ public:
 
     if(M > 0) {
       output[1] += string(M, '-');
+      // Add more space
+      output[0] = string(M / 2, ' ') + output[0];
     }
 
     typename vector<string>::iterator itr = output.begin();
@@ -362,13 +365,18 @@ BSTNode<T>* BSTree<T>::__delete(int key, BSTNode<T>* curr, int& c) {
 
   // Search
   if (key < curr->key) {
-    if(curr->left == nullptr) return nullptr;
     curr->left = BSTree<T>::__delete(key, curr->left, c);
     return curr;
   } else if(key > curr->key) {
-    if(curr->right == nullptr) return nullptr;
     curr->right = BSTree<T>::__delete(key, curr->right, c);
     return curr;
+  };
+
+  // If Node is leaf Node
+  if(BSTree<T>::isLeaf(curr)) {
+    delete curr;
+    c--;
+    return nullptr;
   };
 
   // Match
