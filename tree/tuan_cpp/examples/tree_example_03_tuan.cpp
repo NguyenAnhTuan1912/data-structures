@@ -284,20 +284,17 @@ TTNode<T>* TTree<T>::__insert(int key, T*& data, TTNode<T>* curr, int& d, int& c
         || ((nChildrenOfLeftChild == nChildrenOfMidChild) && (nChildrenOfLeftChild == nChildrenOfRightChild))
     ) {
       curr->left = TTree<T>::__insert(key, data, curr->left, ++d, c);
-      return curr;
     }
     // To mid
     else if(nChildrenOfLeftChild > nChildrenOfMidChild) {
       curr->mid = TTree<T>::__insert(key, data, curr->mid, ++d, c);
-      return curr;
     }
     // To right
     else {
       curr->right = TTree<T>::__insert(key, data, curr->right, ++d, c);
-      return curr;
     };
 
-    return nullptr;
+    return curr;
   } catch(const exception& e) {
     cout << "Insert Error: ";
     cerr << e.what();
