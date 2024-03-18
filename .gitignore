@@ -1,9 +1,12 @@
+# C++
 */**/bin
 */**/obj
+
+*.cpp.swp
 
 *.o
 *.exe
 
-# rust
+# Rust
 target
 Cargo.lock
