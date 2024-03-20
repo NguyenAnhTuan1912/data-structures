@@ -81,6 +81,11 @@ public:
       else if(word[index] == ptr->data) {
         // If all characters of word are in TST before, stop the insertion.
         if(index == N) return;
+        // If last character of word is equal to ptr->data
+        if(word[N - 1] == ptr->data) {
+          ptr->isEnd = true;
+          return;
+        };
         // Increase index by 1 to check the next char.
         prev = ptr;
         ptr = ptr->mid;
@@ -204,14 +209,16 @@ public:
     // with first character of remain characters of first word in substree.
     // => When the first character of remain characters of first word is found,
     // other related words will be found.
-    while(ptr != nullptr) {
+    while(index < N) {
       if(part[index] < ptr->data) {
         ptr = ptr->left;
       } else if(part[index] > ptr->data) {
         ptr = ptr->right;
       } else if(part[index] == ptr->data) {
+        if(ptr->isEnd && part[index] == ptr->data) {
+          relatedWords.push_back(part);
+        };
         ptr = ptr->mid;
-        if(index == N - 1) break;
         index++;
       };
     };
@@ -389,6 +396,7 @@ int main() {
   tree.insertItem("audit");
   tree.insertItem("attempt");
   tree.insertItem("banana");
+  tree.insertItem("ban");
 
    // Traverse
   cout << "Traverse tree (Inorder)\n";
