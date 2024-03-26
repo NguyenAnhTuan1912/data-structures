@@ -25,7 +25,7 @@
 
 using namespace std;
 
-enum TraverseType {
+enum TreeTraverseType {
   Empty,
   Inorder,
   Preorder,
@@ -196,9 +196,9 @@ public:
   };
 
   // traverse
-  void traverse(ConstTSTNodeCallBack& cb, TraverseType traverseType = Inorder) {
+  void traverse(ConstTSTNodeCallBack& cb, TreeTraverseType TreeTraverseType = Inorder) {
     int d = 0;
-    switch(traverseType) {
+    switch(TreeTraverseType) {
       case Preorder: {
         this->__traversePreorder(cb, this->__root, d);
         break;

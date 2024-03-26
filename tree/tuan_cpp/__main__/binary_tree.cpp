@@ -13,7 +13,7 @@
 #include <iterator>
 #include <exception>
 
-enum TraverseType {
+enum TreeTraverseType {
   Empty,
   Inorder,
   Preorder,
@@ -98,9 +98,9 @@ public:
   };
 
   // traverse
-  void traverse(ConstBTNodeCallBack<T>& cb, TraverseType traverseType = Inorder) {
+  void traverse(ConstBTNodeCallBack<T>& cb, TreeTraverseType TreeTraverseType = Inorder) {
     int d = 0;
-    switch(traverseType) {
+    switch(TreeTraverseType) {
       case Preorder: {
         this->__traversePreorder(cb, this->__root, this->__root, d);
         break;

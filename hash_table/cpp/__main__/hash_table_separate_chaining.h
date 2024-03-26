@@ -18,14 +18,26 @@ class HashTable {
 private:
   std::vector<std::vector<Bucket<T>>> __data = std::vector<std::vector<Bucket<T>>>(10);
 
+  // TO DO: dùng để lấy hashed index.
+  //
+  // Note: vì table nó không còn lưu theo từng bucket nữa, mà nó sẽ lưu theo từng
+  // list bucket, nên mình cần phải biết được index của bucket trong list.
+  // Nhận vào key là std::string để lấy ra hashed index của bucket có
+  // bucket.key = key.
+  // Các bước thực hiện:
+  // 1. Khởi tạo index = 0.
+  // 2. Bắt đầu vòng lặp while
+  //   2.0. Nếu như bucket.key = key hoặc hashed index = table size - 1, thì dừng lại.
+  //   2.1. Tăng hashed index lên 1, quay lại bước 2.0.
+  // 3. Trả về index.
   int __getIndexOfBucket(int index, std::string key) {
-    int j = 0;
+    int index = 0;
 
-    while(__data[index][j].key != key && j < __data[index].size() - 1) {
-      j++;
+    while(__data[index][index].key != key && j < __data[index].size() - 1) {
+      index++;
     };
 
-    return j;
+    return index;
   };
 
 public:
@@ -34,19 +46,41 @@ public:
     this->__data = std::vector<std::vector<Bucket<T>>>(10);
   };
 
-  // hash
+  // TO DO: tạo một hashed index.
+  //
+  // Nhận vào một key là std::string để hash.
+  //
+  // Note: với separate chaining thì mọi thứ dễ dàng và chính xác hơn. Nên dùng
+  // approach này.
+  //
+  // Các bước thực hiện:
+  // 1. Khởi tạo một biến đếm và total = 0.
+  // 2. Bắt đầu vòng lặp while
+  //   2.0. Nếu như i = key.size() nghĩa là lặp xong chuỗi key.
+  //   2.1. Tăng total lên với giá trị bằng với kí tự hiện tại.
+  //   2.2. Tăng biến đếm lên 1, quay lại bước 2.0.
+  // 3. Trả về hashed index với phép tính dư giữa total và size của table.
   int hash(std::string key, bool hashOnly = false) {
-    int i = 0, index = 0;
+    int i = 0, total = 0;
 
     while(key[i] != '\0') {
-      index += key[i];
+      total += key[i];
       i++;
     };
 
-    return index % __data.size();
+    return total % __data.size();
   };
 
-  // insert
+  // TO DO: thêm một bucket (chứa data) mới vào trong table.
+  //
+  // Nhận vào một key là std::string và có value là T. Một bucket sẽ được tạo
+  // từ key và value.
+  // Note: trong table, thì bucket đã tồn tại, nhưng dữ liệu của nó thì trống.
+  // Các bước thực hiện:
+  // 1. Kiểm tra xem bucket cuối trong list này trống hay không, nếu không trống thì thông báo và dừng
+  // việc thêm. Còn trống thì tới bước tiếp theo.
+  // 2. Hash key.
+  // 3. Tạo một bucket mới và push bucket này vào cuối list.
   void insert(std::string key, T value) {
     // Check key
     if(!this->isBucketEmpty(key)) {
@@ -58,7 +92,16 @@ public:
     __data[index].push_back(Bucket<T>(key, new T(value)));
   };
 
-  // remove
+  // TO DO: remove bucket ra khỏi list.
+  //
+  // Nhận vào key là std::string của bucket cần xóa.
+  // Các bước thực hiện:
+  // 1. Nếu như table rỗng thì dừng lại.
+  // 2. Hash key.
+  // 3. Kiểm tra xem list có rỗng hay không thì dừng lại.
+  // 4. Lấy index của bucket trong list.
+  // 5. Nếu như bucket đó rỗng thì dừng lại.
+  // 6. Xóa bucket đó ra khỏi list.
   void remove(std::string key) {
     if(__data.size() == 0) return;
     int index = this->hash(key);
@@ -72,7 +115,16 @@ public:
     __data[index].erase(__data[index].begin() + j);
   };
 
-  // get
+  // TO DO: lấy dữ liệu trong bucket.
+  //
+  // Nhận vào key là std::string của bucket cần lấy dữ liệu.
+  // Các bước thực hiện:
+  // 1. Nếu như table rỗng thì dừng lại.
+  // 2. Hash key.
+  // 3. Kiểm tra xem list có rỗng hay không thì dừng lại.
+  // 4. Lấy index của bucket trong list.
+  // 5. Nếu như bucket đó rỗng thì dừng lại.
+  // 6. Trả về value của bucket, nếu như bucket đó rỗng hoặc không tồn tại thì trả về `nullptr`.
   T* get(std::string key) {
     int index = this->hash(key);
 
@@ -85,7 +137,14 @@ public:
     return __data[index][j].value;
   };
 
-  // isBucketEmpty
+  // TO DO: kiểm tra xem bucket có data hay chưa.
+  //
+  // Nhận vào key là std::string của bucket cần check.
+  // Các bước thực hiện:
+  // 1. Lấy hashed index từ key.
+  // 2. Nếu list rỗng thì trả về true.
+  // 3. Lấy ra index của bucket với key và hashed index.
+  // 4. Kiểm tra xem bucket.key có bằng với key hay không, trả về kết quả đó.
   bool isBucketEmpty(std::string key) {
     int index = this->hash(key);
 
@@ -96,12 +155,19 @@ public:
     return __data[index][j].key != key;
   };
 
-  // getSize
+  // TO DO: trả về size của table.
+  //
+  // Note: size này không phải ánh được việc có bao nhiêu dữ liệu đã được lưu,
+  // nó cho biết trong table đã có bao nhiêu list bucket.
   size_t getSize() {
     return __data.size();
   };
 
-  // forEach
+  // TO DO:
+  //
+  // Nhận vào một callback để tùy chỉnh việc thao tác với dữ liệu.
+  // Với việc table chứa các list bucket, thì phải lặp tới từng list đó và
+  // sau đó là lặp từng list đó thì mới có thể lấy được dữ liệu.
   void forEach(ConstBucketCallBack<T> cb) {
     typename std::vector<std::vector<Bucket<T>>>::iterator itr = __data.begin();
     typename std::vector<std::vector<Bucket<T>>>::iterator end_itr = __data.end();
