@@ -1,6 +1,7 @@
 /*
   @author Nguyen Anh Tuan
   Trong bài này mình sẽ cài đặt code của Undirected Graph
+  (With another implementation)
 
   Basic operation:
   - bool adjacent(string x, string y);
@@ -21,7 +22,7 @@
 
 #include <iostream>
 #include <vector>
-#include <map>
+#include <unordered_set>
 #include <functional>
 #include <iterator>
 #include <exception>
@@ -39,8 +40,6 @@ class Vertex {
 private:
   string __key = "";
   T* __data = nullptr;
-  map<string, Vertex*> __linkedVertices;
-  // vector<Vertex*> __linkedVertices;
 
 public:
   Vertex() = default;
@@ -64,31 +63,6 @@ public:
     this->__data = ptrD;
   };
 
-  void addLinkedVertex(Vertex<T>& v) {
-    if(this->__linkedVertices[v.__key] == nullptr)
-      this->__linkedVertices[v.__key] = &v;
-    // this->__linkedVertices.push_back(&v);
-  };
-
-  void addLinkedVertex(Vertex<T>* v) {
-    if(this->__linkedVertices[v->__key] == nullptr)
-      this->__linkedVertices[v->__key] = v;
-    // this->__linkedVertices.push_back(v);
-  };
-
-  void removeLinkedVertex(string y) {
-    if(this->__linkedVertices[y] != nullptr)
-      this->__linkedVertices.erase(y);
-  };
-
-  bool hasEdgeWith(string y) {
-    return this->__linkedVertices[y] != nullptr;
-  };
-
-  bool hasEdgeWith(Vertex<T>* yV) {
-    return this->__linkedVertices[yV->getKey()] != nullptr;
-  };
-
   bool is(string x) {
     return this->__key == x;
   };
@@ -105,29 +79,22 @@ public:
     this->value = new int(v < 0 ? 0 : v);
   };
 
-  void print() const {
+  void print() {
     cout
       << this->first->getKey() << "-"
       << this->second->getKey();
   };
 
-  bool check(string x, string y) const {
+  bool check(string x, string y) {
     return (this->first->is(x) && this->second->is(y)) || (this->first->is(y) && this->second->is(x));
   };
 };
 
-// Types
-template<class T>
-using ConstVertexCallBack = function<void(const Vertex<T>* ptrV)>;
-
-template<class T>
-using ConstUndirectedEdgeCallBack = function<void(const UndirectedEdge<T>* ptrE)>;
-
 template<class T>
 class UndirectedGraph {
 private:
-  vector<UndirectedEdge<T>*> __edges;
-  map<string, Vertex<T>*> __vertices;
+  unordered_set<UndirectedEdge<T>*> __edges;
+  unordered_set<string, Vertex<T>*> __vertices;
 
   UndirectedEdge<T>* __getEdge(string x, string y) {
     if(!this->adjacent(x, y)) return nullptr;
@@ -143,9 +110,9 @@ private:
 
   typename vector<UndirectedEdge<T>*>::iterator __getEdgeIterator(string x, string y) {
     if(!this->adjacent(x, y)) return this->__edges.end();
-    
-    typename vector<UndirectedEdge<T>*>::iterator itr = this->__edges.begin();
 
+    typename vector<UndirectedEdge<T>*>::iterator itr = this->__edges.begin();
+    
     while(itr != this->__edges.end()) {
       if((*itr)->check(x, y)) return itr;
       itr++;
@@ -153,12 +120,6 @@ private:
 
     return this->__edges.end();
   };
-
-  // Static Methods
-  static void __iterateEdges(UndirectedGraph<T>& g, ConstUndirectedEdgeCallBack<T>& cb);
-
-  static void __depthFirstTraverse(UndirectedGraph<T>& g, ConstVertexCallBack<T>& cb);
-  static void __breadthFirstTraverse(UndirectedGraph<T>& g, ConstVertexCallBack<T>& cb);
 
 public:
   UndirectedGraph() = default;
@@ -168,43 +129,23 @@ public:
   UndirectedGraph(string k, T v) {
     __vertices.insert(new Vertex<T>(k , v));
   };
+  // Static methods
 
   // Fundamental Operations
 
   // [OPERATION]
-  vector<UndirectedEdge<T>*>& getEdges() {
-    return this->__edges;
-  };
-
-  map<string, Vertex<T>*>& getVertices() {
-    return this->__vertices;
-  };
-
-  // [MAIN OPERATION]
   // adjacent -> bool
   bool adjacent(string x, string y) {
     return this->__vertices[x]->hasEdgeWith(y) && this->__vertices[y]->hasEdgeWith(x);
   };
 
-  // [MAIN OPERATION]
+  // [OPERATION]
   // getNeighbors -> vector<Vertext<T>*>
-  vector<Vertex<T>*>* getNeighbors(string x) {
-    if(this->__edges.size() == 0 || this->__vertices.size() == 0) return nullptr;
+  vector<Vertex<T>*> getNeighbors(string x) {
 
-    vector<Vertex<T>*>* result = new vector<Vertex<T>*>();
-    typename vector<UndirectedEdge<T>*>::iterator itrE = this->__edges.begin();
-
-    ConstUndirectedEdgeCallBack<T> cb = [&](const UndirectedEdge<T>* ptrE) {
-      if(ptrE->first->getKey() == x) result->push_back(ptrE->second);
-      if(ptrE->second->getKey() == x) result->push_back(ptrE->first);
-    };
-
-    UndirectedGraph<T>::__iterateEdges(*this, cb);
-
-    return result;
   };
 
-  // [MAIN OPERATION]
+  // [OPERATION]
   // addVertex -> void
   Vertex<T>* addVertex(string k, T v) {
     // Add vertex to map
@@ -215,35 +156,16 @@ public:
     return nullptr;
   };
 
-  // [MAIN OPERATION]
+  // [OPERATION]
   // removeVertex -> void
   void removeVertex(string k) {
     // Add vertex to map
-    if(this->__vertices[k] == nullptr) return;
-
-    // Define a lambda to delete edges in a vertex (adjacencies)
-    ConstUndirectedEdgeCallBack<T> cb = [&](const UndirectedEdge<T>* ptrE) {
-      if(ptrE->first->getKey() == k) {
-        this->removeEdge(k, ptrE->second->getKey());
-        return;
-      };
-
-      if(ptrE->second->getKey() == k) {
-        this->removeEdge(k, ptrE->first->getKey());
-        return;
-      };
-    };
-    
-    // Delete all edges of vertex `k` first
-    UndirectedGraph<T>::__iterateEdges(*this, cb);
-
-    // Remove vertex `k`
-    delete this->__vertices[k];
-    this->__vertices.erase(k);
-
+    if(this->__vertices[k] != nullptr)
+      delete this->__vertices[k];
+      this->__vertices[k] = nullptr;
   };
 
-  // [MAIN OPERATION]
+  // [OPERATION]
   // addEdge -> void
   void addEdge(string x, string y, int z) {
     if(this->adjacent(x, y)) return;
@@ -269,7 +191,7 @@ public:
     this->__edges.push_back(new UndirectedEdge<T>(vX, vY, z));
   };
 
-  // [MAIN OPERATION]
+  // [OPERATION]
   // removeEdge -> void
   void removeEdge(string x, string y) {
     if(!this->adjacent(x, y)) return;
@@ -284,54 +206,31 @@ public:
     vY->removeLinkedVertex(vX->getKey());
   };
 
-  // [MAIN OPERATION]
+  // [OPERATION]
   // getVertexValue -> T*
   T* getVertexValue(string x) {
     return this->__vertices[x]->getData();
   };
 
-  // [MAIN OPERATION]
+  // [OPERATION]
   // setVertexValue -> void
   void setVertexValue(string x, T value) {
     this->__vertices[x]->setData(x, value);
   };
 
-  // [MAIN OPERATION]
+  // [OPERATION]
   // getEdgeValue -> int*
   int* getEdgeValue(string x, string y) {
     UndirectedEdge<T>* e = this->__getEdge(x, y);
     return e ? e->value : nullptr;
   };
 
-  // [MAIN OPERATION]
+  // [OPERATION]
   // setEdgeValue -> void
   void setEdgeValue(string x, string y, int z) {
     this->__getEdge(x, y)->value = new int(z);
   };
-};
 
-//
-// DEFINITION OF STATIC METHODS
-//
-template<class T>
-void UndirectedGraph<T>::__iterateEdges(UndirectedGraph<T>& g, ConstUndirectedEdgeCallBack<T>& cb) {
-  if(g.getEdges().size() == 0) return;
-
-  typename vector<UndirectedEdge<T>*>::iterator itrE = g.getEdges().begin();
-
-  while(itrE != g.getEdges().end()) {
-    cb(*itrE);
-    itrE++;
-  };
-};
-
-template<class T>
-void UndirectedGraph<T>::__depthFirstTraverse(UndirectedGraph<T>& g, ConstVertexCallBack<T>& cb) {
-
-};
-
-template<class T>
-void UndirectedGraph<T>::__breadthFirstTraverse(UndirectedGraph<T>& g, ConstVertexCallBack<T>& cb) {
 
 };
 
@@ -360,25 +259,12 @@ template<class T>
 void printNeighborsOfvX(UndirectedGraph<T>& g, Vertex<T>*& vX) {
   vector<Vertex<T>*>* neighbors = g.getNeighbors(vX->getKey());
   typename vector<Vertex<T>*>::iterator itr = neighbors->begin();
-
   cout << "Neighbors of " << vX->getKey() << ": \n";
   while(itr != neighbors->end()) {
     cout << (*itr)->getKey() << " ";
     itr++;
   };
   cout << endl;
-};
-
-template<class T>
-void printNeigborsOfEachVertexInGraph(UndirectedGraph<T>& g) {
-  typename map<string, Vertex<T>*>::iterator itr = g.getVertices().begin();
-
-  while(itr != g.getVertices().end()) {
-    cout << "Get neighbor of " << itr->second->getKey() << "...\n";
-    printNeighborsOfvX(g, itr->second);
-    cout << endl;
-    itr++;
-  };
 };
 
 int main() {
@@ -429,14 +315,25 @@ int main() {
   printEdgeValueResult(udGraph, vB, vA);
   cout << endl;
 
-  printNeigborsOfEachVertexInGraph(udGraph);
-
-  // Remove C
-  cout << "Remove C from graph...\n";
-  udGraph.removeVertex(vC->getKey());
+  cout << "Get neighbor of A...\n";
+  printNeighborsOfvX(udGraph, vA);
   cout << endl;
 
-  printNeigborsOfEachVertexInGraph(udGraph);
+  cout << "Get neighbor of B...\n";
+  printNeighborsOfvX(udGraph, vB);
+  cout << endl;
+
+  cout << "Get neighbor of C...\n";
+  printNeighborsOfvX(udGraph, vC);
+  cout << endl;
+
+  cout << "Get neighbor of D...\n";
+  printNeighborsOfvX(udGraph, vD);
+  cout << endl;
+
+  cout << "Get neighbor of E...\n";
+  printNeighborsOfvX(udGraph, vE);
+  cout << endl;
 
   return 0;
 };
