@@ -1,18 +1,17 @@
 /*
   @author Nguyen Anh Tuan
-  Trong bài này mình sẽ cài đặt code của Binary Search Tree
-
-  Ấn build để nó hiện ra từng message của lỗi.
-  Để thực thi và xem các ví dụ thì comment những chỗ code lỗi lại.
+  Đây là file code chính thức của Binary Tree, mọi thay đổi về cấu trúc
+  của Binary Tree sẽ được thay đổi trong này. 
 */
+
+#ifndef BINARY_TREE_H_INCLUDED
+#define BINARY_TREE_H_INCLUDED
 
 #include <iostream>
 #include <vector>
 #include <functional>
 #include <iterator>
 #include <exception>
-
-using namespace std;
 
 enum TreeTraverseType {
   Empty,
@@ -22,54 +21,54 @@ enum TreeTraverseType {
 };
 
 template<class T>
-class BSTNode {
+class BTNode {
 public:
   int key = 0;
   T* data = nullptr;
-  BSTNode<T>* left = nullptr;
-  BSTNode<T>* right = nullptr;
+  BTNode<T>* left = nullptr;
+  BTNode<T>* right = nullptr;
 
-  BSTNode() = default;
-  BSTNode(int key, T* data): key{key}, data{data} {};
-  BSTNode(int key, T* data, BSTNode<T>* left, BSTNode<T>* right)
+  BTNode() = default;
+  BTNode(int key, T* data): key{key}, data{data} {};
+  BTNode(int key, T* data, BTNode<T>* left, BTNode<T>* right)
   : key{key}, data{data}, left{move(left)}, right{move(right)} {};
 };
 
 template<class T>
-using ConstBSTNodeCallBack = function<void(const BSTNode<T>*,  BSTNode<T>*, int depth)>;
+using ConstBTNodeCallBack = std::function<void(const BTNode<T>*,  BTNode<T>*, int depth)>;
 
 template<class T>
-class BSTree {
+class BTree {
 private:
-  BSTNode<T>* __root = nullptr;
+  BTNode<T>* __root = nullptr;
   size_t __count = 0;
   int __depth = 0;
   size_t __leftCount = 0;
   size_t __rightCount = 0;
 
   // Static methods
-  static void __traverseInorder(ConstBSTNodeCallBack<T>& cb, BSTNode<T>* curr, BSTNode<T>* parentNode, int d);
-  static void __traversePreorder(ConstBSTNodeCallBack<T>& cb, BSTNode<T>* curr, BSTNode<T>* parentNode, int d);
-  static void __traversePostorder(ConstBSTNodeCallBack<T>& cb, BSTNode<T>* curr, BSTNode<T>* parentNode, int d);
-  static BSTNode<T>* __insert(int key, T*& data, BSTNode<T>* curr, int& d, int& c);
-  static bool __isChildrenCountBalance(BSTree<T>* tree);
-  static bool __isFullOfChildren(BSTNode<T>* node);
-  static int __getNumberOfDirectChildrenOfNode(BSTNode<T>* node);
+  static void __traverseInorder(ConstBTNodeCallBack<T>& cb, BTNode<T>* curr, BTNode<T>* parentNode, int d);
+  static void __traversePreorder(ConstBTNodeCallBack<T>& cb, BTNode<T>* curr, BTNode<T>* parentNode, int d);
+  static void __traversePostorder(ConstBTNodeCallBack<T>& cb, BTNode<T>* curr, BTNode<T>* parentNode, int d);
+  static BTNode<T>* __insert(int key, T*& data, BTNode<T>* curr, int& d, int& c);
+  static bool __isChildrenCountBalance(BTree<T>* tree);
+  static bool __isFullOfChildren(BTNode<T>* node);
+  static int __getNumberOfDirectChildrenOfNode(BTNode<T>* node);
 
 public:
-  BSTree() = default;
-  BSTree(int key, T* data) {
-    this->__root = new BSTNode<T>(key, data);
+  BTree() = default;
+  BTree(int key, T* data) {
+    this->__root = new BTNode<T>(key, data);
     this->__count++;
   };
-  BSTree(int key, T data) {
-    this->__root = new BSTNode<T>(key, new T(data));
+  BTree(int key, T data) {
+    this->__root = new BTNode<T>(key, new T(data));
     this->__count++;
   };
 
   // Static methods
-  static bool isLeaf(const BSTNode<T>* node);
-  static bool isLeaf(BSTNode<T>* node);
+  static bool isLeaf(const BTNode<T>* node);
+  static bool isLeaf(BTNode<T>* node);
 
   // insertItem
   void insertItem(int key, T* data) {
@@ -99,7 +98,7 @@ public:
   };
 
   // traverse
-  void traverse(ConstBSTNodeCallBack<T>& cb, TreeTraverseType TreeTraverseType = Inorder) {
+  void traverse(ConstBTNodeCallBack<T>& cb, TreeTraverseType TreeTraverseType = Inorder) {
     int d = 0;
     switch(TreeTraverseType) {
       case Preorder: {
@@ -129,11 +128,11 @@ public:
   // print
   void print() {
     int D = this->__depth, maxOutputLength = 0;
-    vector<string> output((D + 1) * 2 - 1);
+    std::vector<std::string> output((D + 1) * 2 - 1);
     
-    ConstBSTNodeCallBack<T> cb = [&](const BSTNode<T>* node,  BSTNode<T>* parent, int depth) {
+    ConstBTNodeCallBack<T> cb = [&](const BTNode<T>* node,  BTNode<T>* parent, int depth) {
       int index = depth * 2, M = 0, N = 0;
-      string dashes = "", spaces = "", subOutput = "", keyStr = to_string(node->key);
+      std::string dashes = "", spaces = "", subOutput = "", keyStr = std::to_string(node->key);
       
       // Root of subtree
       if(!this->isLeaf(node)) {
@@ -148,8 +147,8 @@ public:
             M = 2;
           };
 
-          dashes = string(N, ' ');
-          dashes += string(M, '-');
+          dashes = std::string(N, ' ');
+          dashes += std::string(M, '-');
 
           output[index + 1] += dashes;
 
@@ -159,7 +158,7 @@ public:
         // Add key string
         N = maxOutputLength - output[index].size() - 1;
 
-        subOutput = string(N, ' ');
+        subOutput = std::string(N, ' ');
         subOutput += keyStr;
 
         output[index] += subOutput;
@@ -171,15 +170,15 @@ public:
         if(node->right != nullptr) {
           if(output[index + 1] == "") {
             N = maxOutputLength - 1;
-            M = to_string(node->right->key).size() + 1;
+            M = std::to_string(node->right->key).size() + 1;
           } else {
             N = maxOutputLength - output[index + 1].size() - (keyStr.size());
             N = N < 0 ? 0 : N;
             M = keyStr.size() + 1;
           };
 
-          dashes = string(N, ' ');
-          dashes += string(M, '-');
+          dashes = std::string(N, ' ');
+          dashes += std::string(M, '-');
 
           output[index + 1] += dashes;
 
@@ -193,7 +192,7 @@ public:
         if(output[index] == "") N = N < 0 ? 0 : N;
         else N = N < 0 ? 1 : N;
 
-        subOutput = string(N, ' ');
+        subOutput = std::string(N, ' ');
         subOutput += keyStr;
         output[index] += subOutput;
 
@@ -207,7 +206,7 @@ public:
           N = maxOutputLength - output[index].size() - 1;
         };
 
-        subOutput = string(N, ' ');
+        subOutput = std::string(N, ' ');
         subOutput += keyStr;
 
         output[index] += subOutput;
@@ -219,20 +218,20 @@ public:
     this->traverse(cb, Inorder);
 
     // Last update dashes for right child of root
-    string rightKey = to_string(this->__root->right->key);
+    std::string rightKey = std::to_string(this->__root->right->key);
 
     int M = output[2].size() - output[1].size() - (rightKey.size() - 1);
 
     if(M > 0) {
-      output[1] += string(M, '-');
+      output[1] += std::string(M, '-');
       // Add more space
-      output[0] = string(M / 2, ' ') + output[0];
+      output[0] = std::string(M / 2, ' ') + output[0];
     }
 
-    typename vector<string>::iterator itr = output.begin();
+    typename std::vector<std::string>::iterator itr = output.begin();
 
     while(itr != output.end()) {
-      cout << *itr << endl;
+      std::cout << *itr << std::endl;
       itr++;
     };
   };
@@ -240,58 +239,58 @@ public:
 
 // Define static method
 template<class T>
-bool BSTree<T>::isLeaf(const BSTNode<T>* node) {
+bool BTree<T>::isLeaf(const BTNode<T>* node) {
   return (node->left == nullptr) && (node->right == nullptr);
 };
 
 template<class T>
-bool BSTree<T>::isLeaf(BSTNode<T>* node) {
+bool BTree<T>::isLeaf(BTNode<T>* node) {
   return (node->left == nullptr) && (node->right == nullptr);
 };
 
 template<class T>
-bool BSTree<T>::__isChildrenCountBalance(BSTree<T>* tree) {
+bool BTree<T>::__isChildrenCountBalance(BTree<T>* tree) {
   return (tree->__leftCount == tree->__rightCount);
 };
 
 template<class T>
-int BSTree<T>::__getNumberOfDirectChildrenOfNode(BSTNode<T>* node) {
+int BTree<T>::__getNumberOfDirectChildrenOfNode(BTNode<T>* node) {
   int c = node->left != nullptr ? 1 : 0;
   c += (node->right != nullptr ? 1 : 0);
   return c;
 };
 
 template<class T>
-bool BSTree<T>::__isFullOfChildren(BSTNode<T>* node) {
+bool BTree<T>::__isFullOfChildren(BTNode<T>* node) {
   return (node->left != nullptr) && (node->right != nullptr);
 };
 
 template<class T>
-void BSTree<T>::__traverseInorder(
-  ConstBSTNodeCallBack<T>& cb,
-  BSTNode<T>* curr,
-  BSTNode<T>* parentNode,
+void BTree<T>::__traverseInorder(
+  ConstBTNodeCallBack<T>& cb,
+  BTNode<T>* curr,
+  BTNode<T>* parentNode,
   int d
 ) {
   if(curr == nullptr) return;
 
   if(curr->left != nullptr) {
-    __traverseInorder(cb, curr->left, curr, d + 1);
+    BTree<T>::__traverseInorder(cb, curr->left, curr, d + 1);
   };
 
   // Execute callback
   cb(curr, parentNode, d);
 
   if(curr->right != nullptr) {
-    __traverseInorder(cb, curr->right, curr, d + 1);
+    BTree<T>::__traverseInorder(cb, curr->right, curr, d + 1);
   };
 };
 
 template<class T>
-void BSTree<T>::__traversePreorder(
-  ConstBSTNodeCallBack<T>& cb,
-  BSTNode<T>* curr,
-  BSTNode<T>* parentNode,
+void BTree<T>::__traversePreorder(
+  ConstBTNodeCallBack<T>& cb,
+  BTNode<T>* curr,
+  BTNode<T>* parentNode,
   int d
 ) {
   if(curr == nullptr) return;
@@ -300,29 +299,29 @@ void BSTree<T>::__traversePreorder(
   cb(curr, parentNode, d);
 
   if(curr->left != nullptr) {
-    __traversePreorder(cb, curr->left, curr, d + 1);
+    BTree<T>::__traversePreorder(cb, curr->left, curr, d + 1);
   };
 
   if(curr->right != nullptr) {
-    __traversePreorder(cb, curr->right, curr, d + 1);
+    BTree<T>::__traversePreorder(cb, curr->right, curr, d + 1);
   };
 };
 
 template<class T>
-void BSTree<T>::__traversePostorder(
-  ConstBSTNodeCallBack<T>& cb,
-  BSTNode<T>* curr,
-  BSTNode<T>* parentNode,
+void BTree<T>::__traversePostorder(
+  ConstBTNodeCallBack<T>& cb,
+  BTNode<T>* curr,
+  BTNode<T>* parentNode,
   int d
 ) {
   if(curr == nullptr) return;
 
   if(curr->left != nullptr) {
-    __traversePostorder(cb, curr->left, curr, d + 1);
+    BTree<T>::__traversePostorder(cb, curr->left, curr, d + 1);
   };
 
   if(curr->right != nullptr) {
-    __traversePostorder(cb, curr->right, curr, d + 1);
+    BTree<T>::__traversePostorder(cb, curr->right, curr, d + 1);
   };
 
   // Execute callback
@@ -330,104 +329,38 @@ void BSTree<T>::__traversePostorder(
 };
 
 template<class T>
-BSTNode<T>* BSTree<T>::__insert(int key, T*& data, BSTNode<T>* curr, int& d, int& c) {
+BTNode<T>* BTree<T>::__insert(int key, T*& data, BTNode<T>* curr, int& d, int& c) {
   try {
     if(curr == nullptr) {
       c++;
-      return new BSTNode<T>(key, data);
+      return new BTNode<T>(key, data);
     };
-    if(curr->key == key) throw runtime_error("Cannot add this Node, because this key is exist before!!!");
+    if(curr->key == key) throw std::runtime_error("Cannot add this Node, because this key is exist before!!!");
 
     // Add to left
     if(curr->left == nullptr) {
-      curr->left = BSTree<T>::__insert(key, data, curr->left, ++d, c);
+      curr->left = BTree<T>::__insert(key, data, curr->left, ++d, c);
       return curr;
     } 
     // Add to right
     else if(curr->right == nullptr) {
-      curr->right = BSTree<T>::__insert(key, data, curr->right, ++d, c);
+      curr->right = BTree<T>::__insert(key, data, curr->right, ++d, c);
       return curr;
     };
 
     // Traverse
-    if(BSTree<T>::__isFullOfChildren(curr)) {
-      curr->left = BSTree<T>::__insert(key, data, curr->left, ++d, c);
+    if(BTree<T>::__isFullOfChildren(curr)) {
+      curr->left = BTree<T>::__insert(key, data, curr->left, ++d, c);
     } else {
-      curr->right = BSTree<T>::__insert(key, data, curr->right, ++d, c);
+      curr->right = BTree<T>::__insert(key, data, curr->right, ++d, c);
     };
 
     return curr;
-  } catch(const exception& e) {
-    cout << "Insert Error: ";
-    cerr << e.what();
+  } catch(const std::exception& e) {
+    std::cout << "Insert Error: ";
+    std::cerr << e.what();
     return nullptr;
   };
 };
 
-int main() {
-  // Lambda
-  ConstBSTNodeCallBack<int> printValue = [](const BSTNode<int>* node, BSTNode<int>* parent, int depth) {
-    cout << *(node->data) << " ";
-  };
-
-  // Declare binary search tree
-  BSTree<int> tree;
-
-  tree.insertItem(5, new int(5));
-  tree.insertItem(3, new int(3));
-  tree.insertItem(9, new int(9));
-  tree.insertItem(8, new int(8));
-  tree.insertItem(10, new int(10));
-  tree.insertItem(2, new int(2));
-  tree.insertItem(7, new int(7));
-
-  cout << "Depth of tree: " << tree.getDepth() << endl;
-
-  cout << "Traverse tree (Inorder)\n";
-  tree.traverse(printValue);
-  cout << endl;
-  cout << "Traverse tree (Preorder)\n";
-  tree.traverse(printValue, Preorder);
-  cout << endl;
-  cout << "Traverse tree (Postorder)\n";
-  tree.traverse(printValue, Postorder);
-  cout << endl;
-
-  // Print
-  cout << "Print tree: \n";
-  tree.print();
-  cout << endl;
-
-  cout << "Traverse tree (Inorder)\n";
-  tree.traverse(printValue);
-  cout << endl;
-  cout << "Traverse tree (Preorder)\n";
-  tree.traverse(printValue, Preorder);
-  cout << endl;
-  cout << "Traverse tree (Postorder)\n";
-  tree.traverse(printValue, Postorder);
-  cout << endl;
-
-  // Print
-  cout << "Print tree: \n";
-  tree.print();
-  cout << endl;
-
-  tree = BSTree<int>(8, new int(8));
-
-  tree.insertItem(3, new int(3));
-  tree.insertItem(2, new int(2));
-  tree.insertItem(4, new int(4));
-  tree.insertItem(100, new int(100));
-  tree.insertItem(10, new int(10));
-  tree.insertItem(102, new int(102));
-  tree.insertItem(5, new int(5));
-  tree.insertItem(9, new int(9));
-
-  // Print
-  cout << "Print tree: \n";
-  tree.print();
-  cout << endl;
-
-  return 0;
-};
+#endif // BINARY_TREE_H_INCLUDED

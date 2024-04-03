@@ -1,20 +1,11 @@
 /*
   @author Nguyen Anh Tuan
-  Trong bài này mình sẽ cài đặt code của Ternary Search Tree
-
-  Note:
-  Có một điều khá thú vị là cách là implement Ternary Search Tree sẽ khác hoàn toàn so với
-  Binary Tree, Binary Search Tree và Ternary Tree.
-
-  Thay vì một Node cần key-value (data) thì giờ mình chỉ cần có data (char) là được.
-  Bởi vì một từ khi được thêm vào trong cây thì các ký tự của từ sẽ được phân tách ra và
-  lưu lại thành từng Node.
-
-  Có vẻ như là Ternary Search Tree "chỉ" có thể dùng với string.
-
-  Ấn build để nó hiện ra từng message của lỗi.
-  Để thực thi và xem các ví dụ thì comment những chỗ code lỗi lại.
+  Đây là file code chính thức của Ternary Search Tree, mọi thay đổi về cấu trúc
+  của Ternary Search Tree sẽ được thay đổi trong này.
 */
+
+#ifndef TERNARY_SEARCH_TREE_H_INCLUDED
+#define TERNARY_SEARCH_TREE_H_INCLUDED
 
 #include <iostream>
 #include <vector>
@@ -22,8 +13,6 @@
 #include <iterator>
 #include <exception>
 #include <string>
-
-using namespace std;
 
 enum TreeTraverseType {
   Empty,
@@ -43,10 +32,10 @@ public:
   TSTNode() = default;
   TSTNode(char data): data{data} {};
   TSTNode(char data, TSTNode* left, TSTNode* mid, TSTNode* right)
-  : data{data}, left{move(left)}, mid{move(mid)}, right{move(right)} {};
+  : data{data}, left{std::move(left)}, mid{std::move(mid)}, right{std::move(right)} {};
 };
 
-using ConstTSTNodeCallBack = function<void(const TSTNode*, int depth)>;
+using ConstTSTNodeCallBack = std::function<void(const TSTNode*, int depth)>;
 
 class TSTree {
 private:
@@ -61,16 +50,16 @@ private:
 
 public:
   TSTree() = default;
-  TSTree(string data) {
+  TSTree(std::string data) {
     this->insertItem(data);
   };
-  
+
   // Static methods
   static bool isLeaf(const TSTNode* node);
   static bool isLeaf(TSTNode* node);
-
+  
   // insertItem
-  void insertItem(string word) {
+  void insertItem(std::string word) {
     if(word.empty()) return;
 
     TSTNode *ptr = this->__root, *prev = this->__root;
@@ -90,6 +79,11 @@ public:
       else if(word[index] == ptr->data) {
         // If all characters of word are in TST before, stop the insertion.
         if(index == N) return;
+        // If last character of word is equal to ptr->data
+        if(word[N - 1] == ptr->data) {
+          ptr->isEnd = true;
+          return;
+        };
         // Increase index by 1 to check the next char.
         prev = ptr;
         ptr = ptr->mid;
@@ -111,6 +105,9 @@ public:
     } else if(word[index] > prev->data) {
       prev->right = ptr;
       ptr->data = word[index];
+    } else if(word[index] == prev->data) {
+      prev->mid = ptr;
+      ptr->data = word[index];
     };
 
     index++;
@@ -128,7 +125,7 @@ public:
   };
 
   // deleteItem
-  void deleteItem(string word) {
+  void deleteItem(std::string word) {
     if(word.empty()) return;
 
     TSTNode *ptr = this->__root, *prev = this->__root, *firstMatchMid = nullptr;
@@ -174,7 +171,7 @@ public:
   };
 
   // searchItem
-  bool searchItem(string word) {
+  bool searchItem(std::string word) {
     if(word.empty()) return false;
 
     TSTNode* ptr = this->__root;
@@ -244,18 +241,18 @@ void TSTree::__traverseInorder(
   if(curr == nullptr) return;
 
   if(curr->left != nullptr) {
-    __traverseInorder(cb, curr->left, d + 1);
+    TSTree::__traverseInorder(cb, curr->left, d + 1);
   };
 
   // Execute callback
   cb(curr, d);
 
   if(curr->mid != nullptr) {
-    __traversePreorder(cb, curr->mid, d + 1);
+    TSTree::__traversePreorder(cb, curr->mid, d + 1);
   };
 
   if(curr->right != nullptr) {
-    __traverseInorder(cb, curr->right, d + 1);
+    TSTree::__traverseInorder(cb, curr->right, d + 1);
   };
 };
 
@@ -273,15 +270,15 @@ void TSTree::__traversePreorder(
   cb(curr, d);
 
   if(curr->left != nullptr) {
-    __traversePreorder(cb, curr->left, d + 1);
+    TSTree::__traversePreorder(cb, curr->left, d + 1);
   };
 
   if(curr->mid != nullptr) {
-    __traversePreorder(cb, curr->mid, d + 1);
+    TSTree::__traversePreorder(cb, curr->mid, d + 1);
   };
 
   if(curr->right != nullptr) {
-    __traversePreorder(cb, curr->right, d + 1);
+    TSTree::__traversePreorder(cb, curr->right, d + 1);
   };
 };
 
@@ -296,65 +293,19 @@ void TSTree::__traversePostorder(
   if(curr == nullptr) return;
 
   if(curr->left != nullptr) {
-    __traversePostorder(cb, curr->left, d + 1);
+    TSTree::__traversePostorder(cb, curr->left, d + 1);
   };
 
   if(curr->mid != nullptr) {
-    __traversePreorder(cb, curr->mid, d + 1);
+    TSTree::__traversePreorder(cb, curr->mid, d + 1);
   };
 
   if(curr->right != nullptr) {
-    __traversePostorder(cb, curr->right, d + 1);
+    TSTree::__traversePostorder(cb, curr->right, d + 1);
   };
 
   // Execute callback
   cb(curr, d);
 };
 
-void printSearchResult(TSTree& tree, string query) {
-  cout << "Query: " << query << endl;
-  if(tree.searchItem(query)) 
-    cout << "Found\n";
-  else cout << "Not found\n";
-};
-
-int main() {
-  // Lambda
-  ConstTSTNodeCallBack printNodeData = [](const TSTNode* node, int depth) {
-    cout << node->data << " ";
-  };
-
-  // Declare Ternary Tree
-  TSTree tree;
-  tree.insertItem("apple");
-  tree.insertItem("at");
-  tree.insertItem("ananas");
-  tree.insertItem("be");
-
-   // Traverse
-  cout << "Traverse tree (Inorder)\n";
-  tree.traverse(printNodeData);
-  cout << endl;
-  cout << "Traverse tree (Preorder)\n";
-  tree.traverse(printNodeData, Preorder);
-  cout << endl;
-  cout << "Traverse tree (Postorder)\n";
-  tree.traverse(printNodeData, Postorder);
-  cout << endl; 
-
-  // Get depth
-  cout << "Depth of tree: " << tree.getDepth() << endl;
-
-  printSearchResult(tree, "apple");
-  printSearchResult(tree, "be");
-  printSearchResult(tree, "ananas"); 
-  printSearchResult(tree, "");
-
-  // Delete "ananas"
-  cout << "Delete \"ananas\": " << endl;
-  tree.deleteItem("ananas");
-
-  printSearchResult(tree, "ananas");
-
-  return 0;
-};
+#endif // TERNARY_SEARCH_TREE_H_INCLUDED
