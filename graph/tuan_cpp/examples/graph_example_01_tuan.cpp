@@ -22,16 +22,22 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <stack>
+#include <queue>
 #include <functional>
 #include <iterator>
 #include <exception>
 
 using namespace std;
 
-enum GraphTraverseType {
-  Empty,
+enum GraphPresentType {
   Matrix,
   List
+};
+
+enum GraphTraverseType {
+  BreadthFirst,
+  DepthFirst
 };
 
 template<class T>
@@ -39,7 +45,7 @@ class Vertex {
 private:
   string __key = "";
   T* __data = nullptr;
-  map<string, Vertex*> __linkedVertices;
+  map<string, Vertex<T>*> __linkedVertices;
   // vector<Vertex*> __linkedVertices;
 
 public:
@@ -48,11 +54,11 @@ public:
   Vertex(string k, T* ptrD): __key{k}, __data{ptrD} {};
   Vertex(string k, T d): __key{k}, __data{new T(d)} {};
 
-  T* getData() {
+  T* getData() const {
     return this->__data;
   };
 
-  string getKey() {
+  string getKey() const {
     return this->__key;
   };
 
@@ -62,6 +68,10 @@ public:
 
   void setData(T* ptrD) {
     this->__data = ptrD;
+  };
+
+  map<string, Vertex<T>*>& getLinkedVertices() {
+    return this->__linkedVertices;
   };
 
   void addLinkedVertex(Vertex<T>& v) {
@@ -81,15 +91,15 @@ public:
       this->__linkedVertices.erase(y);
   };
 
-  bool hasEdgeWith(string y) {
-    return this->__linkedVertices[y] != nullptr;
+  bool hasEdgeWith(string y) const {
+    return this->__linkedVertices.find(y) != this->__linkedVertices.end();
   };
 
-  bool hasEdgeWith(Vertex<T>* yV) {
+  bool hasEdgeWith(Vertex<T>* yV) const {
     return this->__linkedVertices[yV->getKey()] != nullptr;
   };
 
-  bool is(string x) {
+  bool is(string x) const {
     return this->__key == x;
   };
 };
@@ -156,9 +166,8 @@ private:
 
   // Static Methods
   static void __iterateEdges(UndirectedGraph<T>& g, ConstUndirectedEdgeCallBack<T>& cb);
-
-  static void __depthFirstTraverse(UndirectedGraph<T>& g, ConstVertexCallBack<T>& cb);
-  static void __breadthFirstTraverse(UndirectedGraph<T>& g, ConstVertexCallBack<T>& cb);
+  static void __depthFirstTraverse(ConstVertexCallBack<T>& cb, stack<Vertex<T>*>& S, map<string, string>& wasInSVertices);
+  static void __breadthFirstTraverse(ConstVertexCallBack<T>& cb, queue<Vertex<T>*>& Q, map<string, string>& wasInQVertices);
 
 public:
   UndirectedGraph() = default;
@@ -308,6 +317,89 @@ public:
   void setEdgeValue(string x, string y, int z) {
     this->__getEdge(x, y)->value = new int(z);
   };
+
+  // [MAIN OPERATION]
+  // traverse -> void
+  void traverse(string start, ConstVertexCallBack<T>& cb, GraphTraverseType traverseType = DepthFirst) {
+    // If starting vertex isn't exist, stop the operation.
+    if(this->__vertices.find(start) == this->__vertices.end()) return;
+
+    switch (traverseType) {
+      case DepthFirst: {
+        stack<Vertex<T>*> S;
+        map<string, string> wasInSVertices;
+
+        Vertex<T>* v = this->__vertices[start];
+
+        // At start Vertex to L and wasInSVertices
+        S.push(v);
+        wasInSVertices[v->getKey()] = v->getKey();
+
+        return this->__depthFirstTraverse(cb, S, wasInSVertices);
+      };
+      
+      case BreadthFirst: {
+        queue<Vertex<T>*> Q;
+        map<string, string> wasInQVertices;
+
+        Vertex<T>* v = this->__vertices[start];
+
+        // At start Vertex to L and wasInSVertices
+        Q.push(v);
+        wasInQVertices[v->getKey()] = v->getKey();
+
+        return this->__breadthFirstTraverse(cb, Q, wasInQVertices);
+      };
+    };
+  };
+
+  // [MAIN OPERATION]
+  // presentMatrix -> void
+  void presentMatrix() {
+    typename map<string, Vertex<T>*>::iterator itr = this->__vertices.begin();
+
+    // Print 2 spaces
+    cout << "  ";
+    while(itr != this->__vertices.end()) {
+      cout << itr->second->getKey() << " ";
+      itr++;
+    };
+    cout << endl;
+
+    itr = this->__vertices.begin();
+
+    while(itr != this->__vertices.end()) {
+      typename map<string, Vertex<T>*>::iterator temp = this->__vertices.begin();
+      
+      cout << itr->second->getKey() << " ";
+      while(temp != this->__vertices.end()) {
+        if(itr->second->hasEdgeWith(temp->second->getKey())) cout << "1 ";
+        else cout << "0 ";
+        temp++;
+      };
+      cout << endl;
+
+      itr++;
+    };
+  };
+
+  // presentList -> void
+  void presentList() {
+    typename map<string, Vertex<T>*>::iterator itr = this->__vertices.begin();
+
+    while(itr != this->__vertices.end()) {
+      typename map<string, Vertex<T>*>::iterator temp = this->__vertices.begin();
+      
+      cout << itr->second->getKey() << " -> ";
+      while(temp != this->__vertices.end()) {
+        if(itr->second->hasEdgeWith(temp->second->getKey())) cout << temp->second->getKey() << " ";
+        temp++;
+      };
+      cout << endl;
+
+      itr++;
+    };
+  };
 };
 
 //
@@ -326,13 +418,65 @@ void UndirectedGraph<T>::__iterateEdges(UndirectedGraph<T>& g, ConstUndirectedEd
 };
 
 template<class T>
-void UndirectedGraph<T>::__depthFirstTraverse(UndirectedGraph<T>& g, ConstVertexCallBack<T>& cb) {
+void UndirectedGraph<T>::__depthFirstTraverse(ConstVertexCallBack<T>& cb, stack<Vertex<T>*>& S, map<string, string>& wasInSVertices) {
+  if(S.size() == 0) return;
 
+  // Get and pop the top item
+  Vertex<T>* v = S.top();
+  S.pop();
+
+  // Do something
+  cb(v);
+
+  // Get all of its adjacencies
+  typename map<string, Vertex<T>*>::iterator itr = v->getLinkedVertices().begin();
+
+  while(itr != v->getLinkedVertices().end()) {
+    if(wasInSVertices.find(itr->second->getKey()) != wasInSVertices.end()) {
+      itr++;
+      continue;
+    };
+
+    // Mark vertex is visited
+    wasInSVertices[itr->second->getKey()] = itr->second->getKey();
+
+    // Push vertex to stack L
+    S.push(itr->second);
+    itr++;
+  };
+
+  return UndirectedGraph<T>::__depthFirstTraverse(cb, S, wasInSVertices);
 };
 
 template<class T>
-void UndirectedGraph<T>::__breadthFirstTraverse(UndirectedGraph<T>& g, ConstVertexCallBack<T>& cb) {
+void UndirectedGraph<T>::__breadthFirstTraverse(ConstVertexCallBack<T>& cb, queue<Vertex<T>*>& Q, map<string, string>& wasInQVertices) {
+  if(Q.size() == 0) return;
 
+  // Get and pop the front (first) item
+  Vertex<T>* v = Q.front();
+  Q.pop();
+
+  // Do something
+  cb(v);
+
+  // Get all of its adjacencies
+  typename map<string, Vertex<T>*>::iterator itr = v->getLinkedVertices().begin();
+
+  while(itr != v->getLinkedVertices().end()) {
+    if(wasInQVertices.find(itr->second->getKey()) != wasInQVertices.end()) {
+      itr++;
+      continue;
+    };
+
+    // Mark vertex is visited
+    wasInQVertices[itr->second->getKey()] = itr->second->getKey();
+
+    // Push vertex to stack L
+    Q.push(itr->second);
+    itr++;
+  };
+
+  return UndirectedGraph<T>::__breadthFirstTraverse(cb, Q, wasInQVertices);
 };
 
 // Other functions
@@ -379,6 +523,19 @@ void printNeigborsOfEachVertexInGraph(UndirectedGraph<T>& g) {
     cout << endl;
     itr++;
   };
+};
+
+template<class T>
+void printResultOfTraversal(UndirectedGraph<T>& g, string start, GraphTraverseType traverseType) {
+  ConstVertexCallBack<T> cb = [](const Vertex<T>* ptrV) {
+    cout << ptrV->getKey() << " ";
+  };
+
+  if(traverseType == DepthFirst) cout << "Depth First Traverse\n";
+  else cout << "Breadth First Traverse\n";
+  cout << "Start from " << start << endl;
+  g.traverse(start, cb, traverseType);
+  cout << endl << endl;
 };
 
 int main() {
@@ -437,6 +594,19 @@ int main() {
   cout << endl;
 
   printNeigborsOfEachVertexInGraph(udGraph);
+
+  // Traverse
+  printResultOfTraversal(udGraph, vA->getKey(), DepthFirst);
+  printResultOfTraversal(udGraph, vA->getKey(), BreadthFirst);
+
+  // Present
+  cout << "Present Graph in Matrix\n";
+  udGraph.presentMatrix();
+  cout << endl;
+
+  cout << "Present Graph in List\n";
+  udGraph.presentList();
+  cout << endl;
 
   return 0;
 };
