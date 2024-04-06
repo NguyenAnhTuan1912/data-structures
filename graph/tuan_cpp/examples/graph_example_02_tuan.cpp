@@ -246,12 +246,12 @@ public:
     typename map<string, VertexPointer<T>>::iterator itrXV = __vertices.find(x);
     typename map<string, VertexPointer<T>>::iterator itrYV = __vertices.find(y);
 
-    __edges.insert(new DirectedEdge<T>(itrXV->second, itrYV->second, z));
+    __edges.insert(new UndirectedEdge<T>(itrXV->second, itrYV->second, z));
   };
 
   void addEdge(VertexPointer<T>& vX, VertexPointer<T>& vY, int z) {
     if(!this->__isIn(vX->getKey()) || !this->__isIn(vY->getKey())) return;
-    __edges.insert(new DirectedEdge<T>(vX, vY, z));
+    __edges.insert(new UndirectedEdge<T>(vX, vY, z));
   };
 
   // [MAIN OPERATION]
