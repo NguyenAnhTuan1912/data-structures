@@ -63,10 +63,12 @@ public:
   };
 
   void setData(T d) {
+    if(this->__data != nullptr) delete this->__data;
     this->__data = new T(d);
   };
 
   void setData(T* ptrD) {
+    if(this->__data != nullptr) delete this->__data;
     this->__data = ptrD;
   };
 
@@ -172,10 +174,10 @@ private:
 public:
   UndirectedGraph() = default;
   UndirectedGraph(string k, T* v) {
-    __vertices.insert(new Vertex<T>(k , v));
+    __vertices[k] = new Vertex<T>(k , v);
   };
   UndirectedGraph(string k, T v) {
-    __vertices.insert(new Vertex<T>(k , v));
+    __vertices[k] = new Vertex<T>(k , v);
   };
 
   // Fundamental Operations

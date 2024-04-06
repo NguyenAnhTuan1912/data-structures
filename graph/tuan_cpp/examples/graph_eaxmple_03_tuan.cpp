@@ -1,7 +1,7 @@
 /*
   @author Nguyen Anh Tuan
-  Trong bài này mình sẽ cài đặt code của Undirected Graph
-  (With another implementation)
+  Trong bài này mình sẽ cài đặt code của Directed Graph
+  (Similar with the second implementation of UDG)
 
   Basic operation:
   - bool adjacent(string x, string y);
@@ -84,13 +84,13 @@ template<class T>
 using VertexPointer = shared_ptr<Vertex<T>>;
 
 template<class T>
-class UndirectedEdge {
+class DirectedEdge {
 public:
   int* value = nullptr;
   VertexPointer<T> first = nullptr;
   VertexPointer<T> second = nullptr;
 
-  UndirectedEdge(VertexPointer<T> f, VertexPointer<T> s, int v): first{f}, second{s} {
+  DirectedEdge(VertexPointer<T> f, VertexPointer<T> s, int v): first{f}, second{s} {
     this->value = new int(v < 0 ? 0 : v);
   };
 
@@ -101,61 +101,72 @@ public:
   };
 
   bool check(string x, string y) {
-    return (this->first->is(x) && this->second->is(y)) || (this->first->is(y) && this->second->is(x));
+    return this->first->is(x) && this->second->is(y);
   };
 
-  bool operator==(const UndirectedEdge<T>& ue) const {
-    if(
-      (ue.first->getKey() == this->first->getKey() && ue.second->getKey() == this->second->getKey())
-      || (ue.first->getKey() == this->second->getKey() && ue.second->getKey() == this->first->getKey())
-    ) return true;
+  bool operator==(const DirectedEdge<T>& ue) const {
+    if(ue.first->getKey() == this->first->getKey() && ue.second->getKey() == this->second->getKey())
+      return true;
     return false;
   }
 };
 
 template<class T>
-class HashUE {
+class HashDE {
+private:
+  // Static Properties
+  static const int firstSupportHashValue;
+  static const int secondSupportHashValue;
+
 public:
-  size_t operator()(const UndirectedEdge<T>& ue) const {
-    return hash<std::string>()(ue.first->getKey()) + hash<std::string>()(ue.second->getKey());
+  size_t operator()(const DirectedEdge<T>& ue) const {
+    size_t firstValue = (hash<std::string>()(ue.first->getKey()) / this->firstSupportHashValue);
+    size_t secondValue = (hash<std::string>()(ue.second->getKey()) / this->secondSupportHashValue);
+    return  firstValue + secondValue;
   }
 
-  size_t operator()(const UndirectedEdge<T>* ue) const {
-    return hash<std::string>()(ue->first->getKey()) + hash<std::string>()(ue->second->getKey());
+  size_t operator()(const DirectedEdge<T>* ue) const {
+    size_t firstValue = (hash<std::string>()(ue->first->getKey()) / this->firstSupportHashValue);
+    size_t secondValue = (hash<std::string>()(ue->second->getKey()) / this->secondSupportHashValue);
+    return  firstValue + secondValue;
   }
 };
 
 template<class T>
-class KeyEqualUE {
+const int HashDE<T>::firstSupportHashValue = 2;
+
+template<class T>
+const int HashDE<T>::secondSupportHashValue = 3;
+
+template<class T>
+class KeyEqualDE {
 public:
-  bool operator()(const UndirectedEdge<T>* lptrUE, const UndirectedEdge<T>* rptrUE) const {
-    if(
-      (lptrUE->first->getKey() == lptrUE->first->getKey() && lptrUE->second->getKey() == lptrUE->second->getKey())
-      || (lptrUE->first->getKey() == lptrUE->second->getKey() && lptrUE->second->getKey() == lptrUE->first->getKey())
-    ) return true;
+  bool operator()(const DirectedEdge<T>* lptrUE, const DirectedEdge<T>* rptrUE) const {
+    if(lptrUE->first->getKey() == lptrUE->first->getKey() && lptrUE->second->getKey() == lptrUE->second->getKey())
+      return true;
     return false;
   }
 };
 
 // Types
 template<class T>
-using UndirectedEdgeSet = unordered_set<UndirectedEdge<T>*, HashUE<T>, KeyEqualUE<T>>;
+using DirectedEdgeSet = unordered_set<DirectedEdge<T>*, HashDE<T>, KeyEqualDE<T>>;
 
 template<class T>
 using ConstVertexCallBack = function<void(const VertexPointer<T> ptrV)>;
 
 template<class T>
-using ConstUndirectedEdgeCallBack = function<void(const UndirectedEdge<T>* ptrE)>;
+using ConstDirectedEdgeCallBack = function<void(const DirectedEdge<T>* ptrE)>;
 
 template<class T>
-class UndirectedGraph {
+class DirectedGraph {
 private:
-  UndirectedEdgeSet<T> __edges;
+  DirectedEdgeSet<T> __edges;
   map<string, VertexPointer<T>> __vertices;
 
   // Static Methods
-  static void __depthFirstTraverse(ConstVertexCallBack<T>& cb, const vector<UndirectedEdge<T>*> vecUE, stack<VertexPointer<T>>& S, map<string, string>& wasInSVertices);
-  static void __breadthFirstTraverse(ConstVertexCallBack<T>& cb, const vector<UndirectedEdge<T>*> vecUE, queue<VertexPointer<T>>& Q, map<string, string>& wasInQVertices);
+  static void __depthFirstTraverse(ConstVertexCallBack<T>& cb, const vector<DirectedEdge<T>*> vecUE, stack<VertexPointer<T>>& S, map<string, string>& wasInSVertices);
+  static void __breadthFirstTraverse(ConstVertexCallBack<T>& cb, const vector<DirectedEdge<T>*> vecUE, queue<VertexPointer<T>>& Q, map<string, string>& wasInQVertices);
 
   // Other Methods
   bool __isIn(string k) {
@@ -163,16 +174,16 @@ private:
   }
 
 public:
-  UndirectedGraph() = default;
-  UndirectedGraph(string k, T* v) {
+  DirectedGraph() = default;
+  DirectedGraph(string k, T* v) {
     __vertices[k] = make_shared<Vertex<T>>(k , v);
   };
-  UndirectedGraph(string k, T v) {
+  DirectedGraph(string k, T v) {
     __vertices[k] = make_shared<Vertex<T>>(k , v);
   };
 
-  const vector<UndirectedEdge<T>*> getEdges() const {
-    vector<UndirectedEdge<T>*> v;
+  const vector<DirectedEdge<T>*> getEdges() const {
+    vector<DirectedEdge<T>*> v;
 
     for(auto& e : this->__edges) {
       v.push_back(e);
@@ -203,7 +214,6 @@ public:
     vector<VertexPointer<T>> neighbors;
     for(auto& e : this->__edges) {
       if(e->first->getKey() == x) neighbors.push_back(e->second);
-      if(e->second->getKey() == x) neighbors.push_back(e->first);
     };
     return neighbors;
   };
@@ -242,16 +252,16 @@ public:
   void addEdge(string x, string y, int z) {
     // If one of them isn't exist in graph, terminate operation
     if(!this->__isIn(x) || !this->__isIn(y)) return;
-    
+
     typename map<string, VertexPointer<T>>::iterator itrXV = __vertices.find(x);
     typename map<string, VertexPointer<T>>::iterator itrYV = __vertices.find(y);
 
-    __edges.insert(new UndirectedEdge<T>(itrXV->second, itrYV->second, z));
+    __edges.insert(new DirectedEdge<T>(itrXV->second, itrYV->second, z));
   };
 
   void addEdge(VertexPointer<T>& vX, VertexPointer<T>& vY, int z) {
     if(!this->__isIn(vX->getKey()) || !this->__isIn(vY->getKey())) return;
-    __edges.insert(new UndirectedEdge<T>(vX, vY, z));
+    __edges.insert(new DirectedEdge<T>(vX, vY, z));
   };
 
   // [MAIN OPERATION]
@@ -353,7 +363,7 @@ public:
 
       cout << v.second->getKey() << " ";
       for(auto& v2 : __vertices) {
-        if(__edges.find(new UndirectedEdge<T>(v.second, v2.second, 0)) != __edges.end()) cout << "1 ";
+        if(__edges.find(new DirectedEdge<T>(v.second, v2.second, 0)) != __edges.end()) cout << "1 ";
         else cout << "0 ";
       }
       cout << endl;
@@ -367,7 +377,6 @@ public:
       cout << v.second->getKey() << " -> ";
       for(auto& e : __edges) {
         if(e->first->is(v.second->getKey())) cout << e->second->getKey() << " ";
-        if(e->second->is(v.second->getKey())) cout << e->first->getKey() << " ";
       };
       cout << endl;
     };
@@ -378,8 +387,8 @@ public:
 // DEFINITION OF STATIC METHODS
 //
 template<class T>
-void UndirectedGraph<T>::__depthFirstTraverse(
-  ConstVertexCallBack<T>& cb, const vector<UndirectedEdge<T>*> vecUE,
+void DirectedGraph<T>::__depthFirstTraverse(
+  ConstVertexCallBack<T>& cb, const vector<DirectedEdge<T>*> vecUE,
   stack<VertexPointer<T>>& S, map<string, string>& wasInSVertices
 ) {
   if(S.size() == 0) return;
@@ -395,7 +404,6 @@ void UndirectedGraph<T>::__depthFirstTraverse(
     VertexPointer<T> vPtr;
 
     if(e->first->is(v->getKey())) vPtr = e->second;
-    if(e->second->is(v->getKey())) vPtr = e->first;
 
     if(!vPtr) continue;
 
@@ -410,12 +418,12 @@ void UndirectedGraph<T>::__depthFirstTraverse(
     S.push(vPtr);
   };
 
-  return UndirectedGraph<T>::__depthFirstTraverse(cb, vecUE, S, wasInSVertices);
+  return DirectedGraph<T>::__depthFirstTraverse(cb, vecUE, S, wasInSVertices);
 };
 
 template<class T>
-void UndirectedGraph<T>::__breadthFirstTraverse(
-  ConstVertexCallBack<T>& cb, const vector<UndirectedEdge<T>*> vecUE,
+void DirectedGraph<T>::__breadthFirstTraverse(
+  ConstVertexCallBack<T>& cb, const vector<DirectedEdge<T>*> vecUE,
   queue<VertexPointer<T>>& Q, map<string, string>& wasInQVertices
 ) {
   if(Q.size() == 0) return;
@@ -431,7 +439,6 @@ void UndirectedGraph<T>::__breadthFirstTraverse(
     VertexPointer<T> vPtr;
 
     if(e->first->is(v->getKey())) vPtr = e->second;
-    if(e->second->is(v->getKey())) vPtr = e->first;
 
     if(!vPtr) continue;
 
@@ -446,12 +453,12 @@ void UndirectedGraph<T>::__breadthFirstTraverse(
     Q.push(vPtr);
   };
 
-  return UndirectedGraph<T>::__breadthFirstTraverse(cb, vecUE, Q, wasInQVertices);
+  return DirectedGraph<T>::__breadthFirstTraverse(cb, vecUE, Q, wasInQVertices);
 };
 
 // Other functions
 template<class T>
-void printAdjacentCheckingResult(UndirectedGraph<T>& g, VertexPointer<T>& vX, VertexPointer<T>& vY) {
+void printAdjacentCheckingResult(DirectedGraph<T>& g, VertexPointer<T>& vX, VertexPointer<T>& vY) {
   if((vX || vY) == false) {
     cout << "This edge isn't exist\n";
     return;
@@ -465,7 +472,7 @@ void printAdjacentCheckingResult(UndirectedGraph<T>& g, VertexPointer<T>& vX, Ve
 };
 
 template<class T>
-void printEdgeValueResult(UndirectedGraph<T>& g, VertexPointer<T>& vX, VertexPointer<T>& vY) {
+void printEdgeValueResult(DirectedGraph<T>& g, VertexPointer<T>& vX, VertexPointer<T>& vY) {
   int* ptrEValue = g.getEdgeValue(vX->getKey(), vY->getKey());
   cout
     << "Value of edge["
@@ -476,7 +483,7 @@ void printEdgeValueResult(UndirectedGraph<T>& g, VertexPointer<T>& vX, VertexPoi
 };
 
 template<class T>
-void printNeighborsOfvX(UndirectedGraph<T>& g, VertexPointer<T>& vX) {
+void printNeighborsOfvX(DirectedGraph<T>& g, VertexPointer<T>& vX) {
   vector<VertexPointer<T>> neighbors = g.getNeighbors(vX->getKey());
   typename vector<VertexPointer<T>>::iterator itr = neighbors.begin();
   cout << "Neighbors of " << vX->getKey() << ": \n";
@@ -488,7 +495,7 @@ void printNeighborsOfvX(UndirectedGraph<T>& g, VertexPointer<T>& vX) {
 };
 
 template<class T>
-void printResultOfTraversal(UndirectedGraph<T>& g, string start, GraphTraverseType traverseType) {
+void printResultOfTraversal(DirectedGraph<T>& g, string start, GraphTraverseType traverseType) {
   ConstVertexCallBack<T> cb = [](const VertexPointer<T> ptrV) {
     cout << ptrV->getKey() << " ";
   };
@@ -501,91 +508,95 @@ void printResultOfTraversal(UndirectedGraph<T>& g, string start, GraphTraverseTy
 };
 
 int main() {
-  // Initialize UndirectedGraph
-  UndirectedGraph<int> udGraph;
+  // Initialize DirectedGraph
+  DirectedGraph<int> dGraph;
 
   // Add vertices
-  VertexPointer<int> vA = udGraph.addVertex("A", 1);
-  VertexPointer<int> vB = udGraph.addVertex("B", 21);
-  VertexPointer<int> vC = udGraph.addVertex("C", 3);
-  VertexPointer<int> vD = udGraph.addVertex("D", 8);
-  VertexPointer<int> vE = udGraph.addVertex("E", 14);
-  VertexPointer<int> vF = udGraph.addVertex("F", 2);
-  VertexPointer<int> vG = udGraph.addVertex("G", 9);
-  VertexPointer<int> vH = udGraph.addVertex("H", 33);
+  VertexPointer<int> vA = dGraph.addVertex("A", 1);
+  VertexPointer<int> vB = dGraph.addVertex("B", 21);
+  VertexPointer<int> vC = dGraph.addVertex("C", 3);
+  VertexPointer<int> vD = dGraph.addVertex("D", 8);
+  VertexPointer<int> vE = dGraph.addVertex("E", 14);
+  VertexPointer<int> vF = dGraph.addVertex("F", 2);
+  VertexPointer<int> vG = dGraph.addVertex("G", 9);
+  VertexPointer<int> vH = dGraph.addVertex("H", 33);
 
   // Add edges
-  udGraph.addEdge(vA, vB, 2);
-  udGraph.addEdge(vA, vD, 3);
-  udGraph.addEdge(vA, vG, 5);
-  udGraph.addEdge(vB, vC, 1);
-  udGraph.addEdge(vB, vE, 6);
-  udGraph.addEdge(vC, vE, 5);
-  udGraph.addEdge(vD, vF, 6);
-  udGraph.addEdge(vE, vH, 7);
-  udGraph.addEdge(vG, vH, 11);
+  dGraph.addEdge(vA, vB, 2);
+  dGraph.addEdge(vA, vD, 3);
+  dGraph.addEdge(vA, vG, 5);
+  dGraph.addEdge(vB, vA, 10);
+  dGraph.addEdge(vB, vC, 1);
+  dGraph.addEdge(vB, vE, 6);
+  dGraph.addEdge(vC, vE, 5);
+  dGraph.addEdge(vD, vF, 6);
+  dGraph.addEdge(vE, vH, 7);
+  dGraph.addEdge(vG, vH, 11);
 
   // Perform some operations
   cout << "Check adjacencies\n";
-  printAdjacentCheckingResult(udGraph, vA, vB);
-  printAdjacentCheckingResult(udGraph, vD, vA);
-  printAdjacentCheckingResult(udGraph, vF, vD);
-  printAdjacentCheckingResult(udGraph, vE, vH);
-  printAdjacentCheckingResult(udGraph, vA, vC);
-  printAdjacentCheckingResult(udGraph, vD, vC);
-  printAdjacentCheckingResult(udGraph, vG, vH);
-  printAdjacentCheckingResult(udGraph, vE, vC);
-  printAdjacentCheckingResult(udGraph, vF, vG);
+  printAdjacentCheckingResult(dGraph, vA, vB);
+  printAdjacentCheckingResult(dGraph, vA, vD);
+  printAdjacentCheckingResult(dGraph, vA, vG);
+  printAdjacentCheckingResult(dGraph, vF, vD);
+  printAdjacentCheckingResult(dGraph, vE, vH);
+  printAdjacentCheckingResult(dGraph, vA, vC);
+  printAdjacentCheckingResult(dGraph, vD, vC);
+  printAdjacentCheckingResult(dGraph, vG, vH);
+  printAdjacentCheckingResult(dGraph, vC, vE);
+  printAdjacentCheckingResult(dGraph, vF, vG);
   cout << endl;
 
   cout << "Get values of some edges\n";
-  printEdgeValueResult(udGraph, vA, vB);
-  printEdgeValueResult(udGraph, vD, vA);
-  printEdgeValueResult(udGraph, vF, vD);
-  printEdgeValueResult(udGraph, vE, vH);
-  printEdgeValueResult(udGraph, vA, vC);
-  printEdgeValueResult(udGraph, vD, vC);
-  printEdgeValueResult(udGraph, vG, vH);
-  printEdgeValueResult(udGraph, vE, vC);
-  printEdgeValueResult(udGraph, vF, vG);
+  printEdgeValueResult(dGraph, vA, vB);
+  printEdgeValueResult(dGraph, vB, vA);
+  printEdgeValueResult(dGraph, vD, vA);
+  printEdgeValueResult(dGraph, vF, vD);
+  printEdgeValueResult(dGraph, vD, vF);
+  printEdgeValueResult(dGraph, vE, vH);
+  printEdgeValueResult(dGraph, vA, vC);
+  printEdgeValueResult(dGraph, vD, vC);
+  printEdgeValueResult(dGraph, vG, vH);
+  printEdgeValueResult(dGraph, vE, vC);
+  printEdgeValueResult(dGraph, vF, vG);
   cout << endl;
 
   cout << "Neighbors of some vertices\n";
-  printNeighborsOfvX(udGraph, vA);
-  printNeighborsOfvX(udGraph, vB);
-  printNeighborsOfvX(udGraph, vC);
-  printNeighborsOfvX(udGraph, vD);
-  printNeighborsOfvX(udGraph, vE);
-  printNeighborsOfvX(udGraph, vF);
-  printNeighborsOfvX(udGraph, vG);
-  printNeighborsOfvX(udGraph, vH);
+  printNeighborsOfvX(dGraph, vA);
+  printNeighborsOfvX(dGraph, vB);
+  printNeighborsOfvX(dGraph, vC);
+  printNeighborsOfvX(dGraph, vD);
+  printNeighborsOfvX(dGraph, vE);
+  printNeighborsOfvX(dGraph, vF);
+  printNeighborsOfvX(dGraph, vG);
+  printNeighborsOfvX(dGraph, vH);
   cout << endl;
 
   cout << "Delete a vertex (vA)\n";
-  udGraph.removeVertex(vA->getKey());
-  printAdjacentCheckingResult(udGraph, vA, vB);
-  printAdjacentCheckingResult(udGraph, vD, vA);
-  printAdjacentCheckingResult(udGraph, vA, vG);
+  dGraph.removeVertex(vA->getKey());
+  printAdjacentCheckingResult(dGraph, vA, vB);
+  printAdjacentCheckingResult(dGraph, vA, vD);
+  printAdjacentCheckingResult(dGraph, vA, vG);
   cout << endl;
 
-  udGraph.setVertexValue("B", 1233);
-  cout << "New value of vB: " << *(udGraph.getVertexValue("B")) << endl;
+  dGraph.setVertexValue("B", 1233);
+  cout << "New value of vB: " << *(dGraph.getVertexValue("B")) << endl;
 
-  udGraph.setEdgeValue("E", "C", 999);
-  printEdgeValueResult(udGraph, vC, vE);
+  dGraph.setEdgeValue("E", "C", 999);
+  printEdgeValueResult(dGraph, vC, vE);
   cout << endl;
 
   // Traverse
-  printResultOfTraversal(udGraph, vC->getKey(), DepthFirst);
-  printResultOfTraversal(udGraph, vC->getKey(), BreadthFirst);
+  printResultOfTraversal(dGraph, vB->getKey(), DepthFirst);
+  printResultOfTraversal(dGraph, vB->getKey(), BreadthFirst);
 
   // Present
   cout << "Present Graph in Matrix\n";
-  udGraph.presentMatrix();
+  dGraph.presentMatrix();
   cout << endl;
 
   cout << "Present Graph in List\n";
-  udGraph.presentList();
+  dGraph.presentList();
   cout << endl;
 
   return 0;
