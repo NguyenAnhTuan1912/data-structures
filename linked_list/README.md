@@ -1,16 +1,40 @@
 # Linked List
 
 ## Concept
-Update later...
+__[INSERT IMAGE HERE]__
+Linked List similars with Array, but different with Array, Linked List is more flexible. It's a chain contains numerous Node that links to another Node (or other Nodes). Node contains 2 parts: __Data__ and __Link__, __Data__ points or refers to memory that contains data; __Link__ points or refers to Node(s).
+
+There 3 types of Linked List (I implement 2 of them), difference between them is in __Link__ part -> the implementation between is distinct:
+- Singly Linked List: its node only link to one node (called "next node"), contains a __head__ and __tail__ node and 2 vars points or refers to them.
+- Doubly Linked List: its node has 2 links, previous link points or refers to previous node and next link points or refers to next node.
+- Multiply Linked List: its node has multiple links (maybe an array, set, ...). In my opinion, this type of linked list is a type of __graph__.
+
+Linked List is more flexible than Array, because of "Add-Remove-Delete" operations. For example, if an array add an item, it can add to
+- First and Last: the array just add to first or last of array.
+- Arbitrary Index: the array must be re-size itself to add the new item.
+
+And when an array deletes an item, it resizes and delete the memory of item. 
+
+With same operations, Linked List is easier. Add new item to random position, it will locate node at this position, then it performs re-point to new Node, faster, right? As well as delete operation, locate node at this position, re-point and delete data in memory. For more information, please see all of the example below.
 
 ## Examples
 ### With CPP
 1. Example with Singly Linked List
-   - By __Nguyen Anh Tuan__, [view more](/linked_list/cpp/linkedlist_install_tuan.cpp)
+   - By __Nguyen Anh Tuan__, [view more](/linked_list/tuan_cpp/examples/linkedlist_example_01_tuan.cpp)
 2. Example with Doubly Linked List
-   - By __Nguyen Anh Tuan__, [view more](linked_list/cpp/linkedlist_install_02_tuan.cpp)
+   - By __Nguyen Anh Tuan__, [view more](/linked_list/tuan_cpp/examples/linkedlist_example_02_tuan.cpp)
 3. Example with Circular Linked List
-   - By __Nguyen Anh Tuan__, [view more](/linked_list/cpp/linkedlist_install_03_tuan.cpp)
+   - By __Nguyen Anh Tuan__, [view more](/linked_list/tuan_cpp/examples/linkedlist_example_03_tuan.cpp)
+
+### With TS
+1. Example with Singly Linked List
+   - By __Tu Nhat Phuong__, [view more](/linked_list/phuong_ts/examples/linkedlist_example_01_phuong.ts)
+2. Example with Doubly Linked List
+   - By __Tu Nhat Phuong__, [view more](/linked_list/phuong_ts/examples/linkedlist_example_02_phuong.ts)
+
+### With RS
+1. Example with Singly Linked List
+   - By __Luong Van Phap__, [view more](/linked_list/phap_rust/examples/singly_linked_list)
 
 ## Exercises
 *Note: LinkedList always has default constructor and arguments constructor.

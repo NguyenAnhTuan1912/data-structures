@@ -68,6 +68,7 @@ public:
       // Jump 1 slots
       index += 1;
     };
+    
     return index;
   };
 
@@ -99,7 +100,7 @@ public:
   };
 
   // isBucketEmpty
-  bool isBucketEmpty(string key) {
+  bool isBucketEmpty(int key) {
     int index = this->__getIndex(key);
     return __data[index].key != key;
   };

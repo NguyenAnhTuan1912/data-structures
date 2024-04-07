@@ -74,6 +74,7 @@ public:
       // Jump 1 slots
       index += 1;
     };
+    
     return index;
   };
 
